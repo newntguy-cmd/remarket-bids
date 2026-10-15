@@ -203,7 +203,7 @@ body.locked .top,body.locked .view{display:none}
 <header class="top"><div class="in">
   <div class="brand">리마켓 입찰 레이더<small>나라장터 공사 · 낙찰/계약 영업 레이더</small></div>
   <div class="tabs" role="tablist"><button type="button" id="tab-a" aria-pressed="true">낙찰·계약 업체</button><button type="button" id="tab-b" aria-pressed="false">입찰공고</button></div>
-  <div class="topstat" id="topstat"></div><button type="button" class="logout" id="logout" hidden>로그아웃</button>
+  <div class="topstat" id="topstat"></div><a class="logout" id="stats" href="https://remarket-bids.goatcounter.com" target="_blank" rel="noopener" style="text-decoration:none" hidden>방문통계</a> <button type="button" class="logout" id="logout" hidden>로그아웃</button>
 </div></header>
 
 <main class="view" id="v-awards">
@@ -799,7 +799,7 @@ function tryBoot(pw,remember){
   $('gbtn').disabled=true;$('gerr').textContent='';
   return boot(pw).then(()=>{
     try{sessionStorage.setItem('rm-pw',pw);if(remember)localStorage.setItem('rm-pw',pw);}catch(e){}
-    if(locked)$('logout').hidden=false;
+    if(locked){$('logout').hidden=false;$('stats').hidden=false;}
   }).catch(e=>{
     try{sessionStorage.removeItem('rm-pw');localStorage.removeItem('rm-pw');}catch(x){}
     if(e&&(e.pw||e.need))showGate(e.pw?'비밀번호가 맞지 않습니다.':'');
