@@ -1,0 +1,23 @@
+name: squash-history
+# 한 달에 한 번, 쌓인 변경 기록(커밋)을 하나로 합쳐 저장소가 커지지 않게 합니다. 사이트 내용은 그대로입니다.
+on:
+  schedule:
+    - cron: "0 18 1 * *"   # 매월 2일 새벽 3시(한국시간)
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  squash:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Squash
+        run: |
+          git config user.name "bid-bot"
+          git config user.email "bid-bot@users.noreply.github.com"
+          git checkout --orphan squashed
+          git add -A
+          git commit -m "정리: 지난 변경 기록을 하나로 합침"
+          git push --force origin squashed:main

@@ -1,0 +1,57 @@
+name: collect-bids
+
+on:
+  schedule:
+    - cron: "0 22 * * *"   # 매일 한국시간 아침 07:00 (출근 전에 끝나도록)
+  workflow_dispatch:         # 수동 실행 버튼
+    inputs:
+      days:
+        description: "며칠 전 공고까지 가져올까요 (자동 실행은 5일)"
+        default: "60"
+
+permissions:
+  contents: write
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install cryptography
+      - name: Collect bids
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+          SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}
+          DAYS: ${{ inputs.days }}
+        shell: bash
+        run: python collect.py 2>&1 | tee docs/run-log.txt
+      - name: Save bids
+        if: always()
+        run: |
+          git config user.name "bid-bot"
+          git config user.email "bid-bot@users.noreply.github.com"
+          git add docs
+          git diff --cached --quiet || git commit -m "update bid data"
+          git pull --rebase
+          git push
+      - name: Collect awards
+        continue-on-error: true
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+          SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}
+          DAYS: ${{ inputs.days }}
+        shell: bash
+        run: python collect_awards.py 2>&1 | tee -a docs/run-log.txt
+      - name: Commit data
+        if: always()
+        run: |
+          git config user.name "bid-bot"
+          git config user.email "bid-bot@users.noreply.github.com"
+          git add docs
+          git diff --cached --quiet || git commit -m "update bid data"
+          git pull --rebase
+          git push

@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>리마켓 입찰 레이더</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: 어두운 상단바 → 검색창 → 필터·추천 칩 → 도구줄 → 표(행을 눌러 세부내역 펼침) → 페이지 번호 */
+:root{
+  color-scheme:light;
+  --hd:#101b24; --hd-ink:#eaf1f5;
+  --bg:#f1f4f6; --surface:#ffffff; --ink:#15212b; --muted:#566878; --line:#d6dde3;
+  --accent:#0b6e8a; --accent-ink:#ffffff; --accent-soft:#dff0f5;
+  --ok:#1f7a45; --warn:#9a4a05; --warn-soft:#fdf0dc; --bad:#b3261e; --bad-soft:#fbe4e2;
+  --track:#e3e9ed; --star:#d89a00;
+  --font-body:"Noto Sans KR",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-data:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root{
+  color-scheme:dark;
+  --hd:#0a1218; --hd-ink:#e5ecf1;
+  --bg:#0e161c; --surface:#16212a; --ink:#e5ecf1; --muted:#92a3b1; --line:#2a3945;
+  --accent:#4cc3de; --accent-ink:#06222a; --accent-soft:#15343e;
+  --ok:#5fcf8c; --warn:#f0b35a; --warn-soft:#3a2d14; --bad:#ff8a80; --bad-soft:#3d1f1d;
+  --track:#25343f; --star:#f2c14e;}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:14px;line-height:1.5}
+.top{background:var(--hd);color:var(--hd-ink);padding:12px 16px}
+.top .in{max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;justify-content:space-between}
+.brand{font-size:18px;font-weight:700}
+.brand small{font-weight:400;opacity:.7;margin-left:8px;font-size:12px}
+.topstat{font-size:13px;opacity:.85;font-variant-numeric:tabular-nums}
+main{max-width:1280px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:0 1px 2px rgba(16,27,36,.05)}
+.searchrow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.searchbox{flex:1 1 320px;min-width:0;position:relative}
+.searchbox input{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.total{font-size:13px;color:var(--muted);white-space:nowrap}
+.total b{color:var(--ink);font-variant-numeric:tabular-nums}
+.pop{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.lbl{font-size:12px;color:var(--muted);margin-right:2px}
+button,select,input{font:inherit;color:var(--ink)}
+button{border:1px solid var(--line);background:var(--surface);padding:6px 12px;border-radius:6px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+select{border:1px solid var(--line);background:var(--surface);padding:6px 8px;border-radius:6px}
+.cbx{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border:1px solid var(--line,#ccc);border-radius:8px;font-size:13px;cursor:pointer;background:var(--bg)}
+.cbx input{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
+.cbx .n{font-family:var(--font-data);font-size:12px;color:var(--accent)}
+.cbx.on{border-color:var(--accent);font-weight:700}
+.pill{border-radius:999px;padding:4px 11px;font-size:13px;background:var(--bg)}
+.pill .n{font-family:var(--font-data);font-size:12px;margin-left:5px;color:var(--accent)}
+.pill[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.pill[aria-pressed="true"] .n{color:var(--accent-ink)}
+.filters{display:flex;flex-direction:column;gap:10px}
+.frow{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+.frow .lbl{min-width:58px}
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.btn-main{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+.kwset summary{cursor:pointer;color:var(--muted);font-size:13px}
+.kwset input{width:100%;margin-top:8px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:980px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+thead th{font-size:12px;font-weight:500;color:var(--muted);background:var(--bg);white-space:nowrap;position:sticky;top:0}
+thead th button{border:0;background:none;padding:0;color:inherit;font-size:12px;cursor:pointer}
+thead th button[aria-sort]::after{content:" ▲";font-size:10px}
+thead th button[aria-sort="descending"]::after{content:" ▼"}
+tbody tr.main{cursor:pointer}
+tbody tr.main:hover td{background:var(--bg)}
+.mono{font-family:var(--font-data);font-size:12px;white-space:nowrap;font-variant-numeric:tabular-nums}
+td.star{width:36px;text-align:center}
+.starbtn{border:0;background:none;padding:2px 4px;font-size:18px;line-height:1;color:var(--line);cursor:pointer}
+.starbtn[aria-pressed="true"]{color:var(--star)}
+td.title{min-width:280px}
+.new{display:inline-block;background:var(--accent);color:var(--accent-ink);font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;margin-right:6px;vertical-align:1px}
+.kws{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.kw{background:var(--warn-soft);color:var(--warn);border-radius:4px;padding:0 7px;font-size:12px;font-weight:700}
+.region{display:inline-block;background:var(--accent-soft);color:var(--accent);border-radius:4px;padding:1px 8px;font-size:12px;font-weight:700;white-space:nowrap}
+.sitetxt{color:var(--muted);font-size:12px;margin-top:2px}
+.dd{display:flex;flex-direction:column;gap:4px;min-width:112px}
+.dd .lab{font-size:12px;font-weight:700}
+.dd .lab.soon{color:var(--bad)} .dd .lab.done{color:var(--muted)}
+.bar{height:6px;border-radius:3px;background:var(--track);overflow:hidden}
+.bar span{display:block;height:100%;background:var(--ok)}
+.bar.soon span{background:var(--bad)} .bar.done span{background:var(--muted)}
+tr.det td{background:var(--bg);padding:14px 16px}
+.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin:2px 0 14px}
+.rc{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--bg);min-width:0}
+.rc.win{border-left:5px solid var(--accent)}
+.rc.con{border-left:5px solid var(--ok)}
+.rc.con.diff{border-left-color:var(--bad);background:var(--bad-soft)}
+.rc .hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.rc .nm{font-size:17px;font-weight:800;overflow-wrap:anywhere;margin-bottom:2px}
+.rc .ln{display:flex;gap:8px;font-size:14px;padding:3px 0;align-items:baseline;flex-wrap:wrap}
+.rc .ln b{flex:0 0 64px;font-weight:600;color:var(--muted);font-size:12px}
+.rc .ln span,.rc .ln a{overflow-wrap:anywhere;min-width:0}
+.rc .mini{padding:1px 8px;font-size:12px;border-radius:6px}
+.tag{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;font-weight:700}
+.tag.ok{background:var(--accent-soft);color:var(--accent)}
+.tag.same{background:var(--accent-soft);color:var(--ok)}
+.tag.diff{background:var(--bad);color:#fff}
+.note{border:1px dashed var(--line);border-radius:10px;padding:10px 14px;margin:2px 0 14px;color:var(--muted);font-size:14px}
+.wn{font-size:12px;margin-top:4px;color:var(--accent);font-weight:700}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px 18px;margin-bottom:10px}
+.dgrid div{min-width:0}
+.dgrid .k{font-size:12px;color:var(--muted)}
+.dgrid .v{overflow-wrap:anywhere}
+.atts{display:flex;flex-direction:column;gap:3px;font-size:13px}
+a{color:var(--accent)}
+.pager{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;padding:4px 0}
+.pager button{min-width:34px}
+.pager button[aria-current="page"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+.pager button:disabled{opacity:.4;cursor:default}
+.empty{padding:32px 16px;text-align:center;color:var(--muted)}
+.notice{background:var(--warn-soft);color:var(--warn);border-radius:6px;padding:8px 12px;font-size:13px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:6px;font-size:13px;z-index:5}
+#gate{position:fixed;inset:0;z-index:20;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:16px}
+#gate[hidden]{display:none}
+.gbox{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:28px 26px;box-shadow:0 8px 30px rgba(16,27,36,.12)}
+.gbox h1{margin:0 0 4px;font-size:22px}
+.gbox p{margin:0 0 18px;color:var(--muted);font-size:13px}
+.gbox input[type=password]{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-size:15px}
+.gbox .rm{display:flex;gap:8px;align-items:center;margin:12px 0;font-size:13px;color:var(--muted)}
+.gbox .go{width:100%;padding:12px;border-radius:10px;font-weight:700;font-size:15px;background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.gbox .err{min-height:20px;margin-top:10px;color:var(--bad);font-size:13px}
+body.locked .top,body.locked .view{display:none}
+.logout{background:none;border:1px solid rgba(255,255,255,.35);color:var(--hd-ink);padding:3px 10px;border-radius:6px;font-size:12px}
+#fallback{display:none;width:100%;min-height:120px}
+.tabs{display:inline-flex;background:rgba(255,255,255,.1);border-radius:10px;padding:3px;gap:2px}
+.tabs button{border:0;background:none;color:var(--hd-ink);padding:7px 16px;border-radius:8px;font-weight:700;font-size:14px;opacity:.75}
+.tabs button[aria-pressed="true"]{background:var(--surface);color:var(--ink);opacity:1;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.view[hidden]{display:none}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px;box-shadow:0 1px 2px rgba(16,27,36,.05)}
+.kpi .k{font-size:12px;color:var(--muted)}
+.kpi .v{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.25}
+.kpi .v small{font-size:13px;font-weight:500;color:var(--muted);margin-left:4px}
+.ahead,.arow{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr);gap:14px}
+.ahead{padding:0 16px;font-size:12px;color:var(--muted);font-weight:700}
+.ahead .w{color:var(--accent)}.ahead .c{color:var(--ok)}
+.alist{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(16,27,36,.05)}
+.item{border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.ihd{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer}
+.ihd:hover{background:var(--bg)}
+.ihd .dt{flex:0 0 46px;font-family:var(--font-data);font-size:12px;color:var(--muted)}
+.ihd .tt{cursor:text;flex:1;min-width:0;font-weight:600;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ihd .chev{flex:0 0 auto;color:var(--muted);font-size:12px;transition:transform .15s}
+.item.open .ihd{background:var(--accent-soft)}
+.item.open .ihd .chev{transform:rotate(180deg)}
+.item.open .ihd .tt{white-space:normal}
+.ibody{padding:14px 16px 16px;background:var(--bg);border-top:1px solid var(--line)}
+.arow{align-items:start}
+.ibody .box{background:var(--surface)}
+.ibody .box.con.diff{background:var(--bad-soft)}
+.ac{min-width:0}
+.ac .lab{display:none;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px}
+.dchip{display:inline-block;background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:12px;border-radius:6px;padding:1px 8px;margin-right:6px}
+.atitle{font-weight:700;font-size:15px;margin:4px 0 6px;overflow-wrap:anywhere}
+.ameta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.cat{display:inline-block;background:var(--warn-soft);color:var(--warn);border-radius:4px;padding:1px 8px;font-size:12px;font-weight:700}
+.aamt{margin-top:8px;font-size:13px;color:var(--muted)}
+.aamt b{color:var(--ink);font-size:16px;font-variant-numeric:tabular-nums}
+.box{border-radius:10px;padding:10px 12px;background:var(--bg);border-left:4px solid var(--accent);min-height:100%}
+.box.con{border-left-color:var(--ok)}
+.box.con.diff{border-left-color:var(--bad);background:var(--bad-soft)}
+.box.empty{border-left-color:var(--line);color:var(--muted);font-size:13px;display:flex;align-items:center}
+.cn{font-size:16px;font-weight:800;overflow-wrap:anywhere;line-height:1.35}
+.cs{font-size:12px;color:var(--muted);margin:2px 0 6px;overflow-wrap:anywhere}
+.cl{display:flex;gap:8px;align-items:baseline;font-size:13px;padding:2px 0}
+.cl i{font-style:normal;flex:0 0 18px;color:var(--muted);text-align:center}
+.cl span,.cl a{min-width:0;overflow-wrap:anywhere}
+.cl a.tel{font-weight:700;font-size:14px;text-decoration:none}
+.acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.acts button,.acts a{font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid var(--line);background:var(--surface);text-decoration:none;color:var(--ink);cursor:pointer}
+.acts button:hover,.acts a:hover{border-color:var(--accent)}
+.src{font-size:11px;color:var(--muted);margin-top:2px}
+.acts .pri{flex:1 1 100%;text-align:center;padding:6px 10px;background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+.sel{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+@media (max-width:900px){
+  .ahead{display:none}
+  .arow{grid-template-columns:1fr;gap:10px}
+  .ac .lab{display:block}
+}
+</style>
+</head>
+<body class="locked">
+<div id="gate" hidden>
+  <form class="gbox" id="gform">
+    <h1>리마켓 입찰 레이더</h1>
+    <p>팀 비밀번호를 입력하면 낙찰·계약 정보가 열립니다.</p>
+    <input type="password" id="gpw" placeholder="비밀번호" autocomplete="current-password" aria-label="비밀번호" autofocus>
+    <label class="rm"><input type="checkbox" id="grm"> 이 컴퓨터에서는 다시 묻지 않기</label>
+    <button class="go" type="submit" id="gbtn">로그인</button>
+    <div class="err" id="gerr" role="alert"></div>
+  </form>
+</div>
+<header class="top"><div class="in">
+  <div class="brand">리마켓 입찰 레이더<small>나라장터 공사 · 낙찰/계약 영업 레이더</small></div>
+  <div class="tabs" role="tablist"><button type="button" id="tab-a" aria-pressed="true">낙찰·계약 업체</button><button type="button" id="tab-b" aria-pressed="false">입찰공고</button></div>
+  <div class="topstat" id="topstat"></div><button type="button" class="logout" id="logout" hidden>로그아웃</button>
+</div></header>
+
+<main class="view" id="v-awards">
+  <section class="kpis" id="a-kpis"></section>
+  <section class="card filters" aria-label="필터">
+    <div class="searchrow">
+      <div class="searchbox"><input type="search" id="a-q" placeholder="업체명, 공고명, 발주기관, 사업자번호, 전화번호로 검색" aria-label="검색"></div>
+      <div class="total" id="a-total"></div>
+    </div>
+    <div class="frow"><span class="lbl">지역</span><span class="frow" id="a-regions"></span></div>
+    <div class="frow"><span class="lbl">공종</span><span class="frow" id="a-cats"></span></div>
+    <div class="frow">
+      <span class="lbl">낙찰일</span>
+      <select id="a-days" aria-label="낙찰일"><option value="0">오늘</option><option value="3">최근 3일</option><option value="7" selected>최근 7일</option><option value="14">최근 14일</option><option value="30">최근 30일</option><option value="60">최근 2개월</option></select>
+      <span class="lbl" style="margin-left:10px">낙찰금액</span>
+      <select id="a-min" aria-label="낙찰금액">
+        <option value="0">전체</option><option value="10000000">1천만원 이상</option><option value="100000000">1억원 이상</option>
+        <option value="500000000">5억원 이상</option><option value="1000000000">10억원 이상</option>
+      </select>
+      <span class="lbl" style="margin-left:10px">계약</span>
+      <select id="a-con" aria-label="계약 여부">
+        <option value="all">전체</option><option value="done">계약 완료</option><option value="wait">계약 대기</option><option value="diff">낙찰업체와 다른 업체가 계약</option>
+      </select>
+      <span class="lbl" style="margin-left:10px">정렬</span>
+      <select id="a-sort" aria-label="정렬"><option value="date">낙찰일 최신순</option><option value="amt">낙찰금액 큰 순</option></select>
+    </div>
+  </section>
+  <section class="tools">
+    <div class="frow"><button class="btn-main" id="a-dl" type="button">엑셀로 내려받기</button></div>
+    <div class="frow"><select id="a-psize" aria-label="한 번에 볼 개수"><option value="30">30개씩 보기</option><option value="50">50개씩 보기</option><option value="100">100개씩 보기</option></select></div>
+  </section>
+  <section class="alist" id="a-list" aria-label="낙찰·계약 목록"></section>
+  <nav class="pager" id="a-pager" aria-label="페이지"></nav>
+</main>
+
+<main class="view" id="v-bids" hidden>
+
+  <section class="card filters" aria-label="필터">
+    <div class="searchrow">
+      <div class="searchbox"><input type="search" id="q" placeholder="공고명, 기관, 현장지역 검색" aria-label="검색"></div>
+      <div class="total" id="total"></div>
+    </div>
+    <div class="frow"><span class="lbl">지역</span><span class="frow" id="regions"></span></div>
+    <div class="frow"><span class="lbl">공종</span><span class="frow" id="cats"></span></div>
+    <div class="frow">
+      <span class="lbl">입찰마감</span>
+      <select id="period" aria-label="입찰마감 기간">
+        <option value="open">마감 전 공고</option>
+        <option value="today">오늘 마감</option>
+        <option value="all">마감 지난 공고 포함</option>
+      </select>
+      <span class="lbl" style="margin-left:10px">추정가격</span>
+      <select id="price" aria-label="추정가격">
+        <option value="0">전체</option>
+        <option value="10000000">1천만원 이상</option>
+        <option value="100000000">1억원 이상</option>
+        <option value="500000000">5억원 이상</option>
+        <option value="1000000000">10억원 이상</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="tools">
+    <div class="frow">
+      <button class="btn-main" id="dl" type="button">데이터 다운로드 (엑셀)</button>
+    </div>
+    <div class="frow">
+      <select id="psize" aria-label="한 번에 볼 개수">
+        <option value="30">30개씩 보기</option><option value="50">50개씩 보기</option><option value="100">100개씩 보기</option>
+      </select>
+    </div>
+  </section>
+
+  <div class="notice" id="msg" hidden></div>
+
+  <section class="tablewrap" aria-label="공고 목록">
+    <table>
+      <thead><tr>
+        <th><button type="button" data-key="title">공고명</button></th>
+        <th><button type="button" data-key="org">수요기관</button></th>
+        <th><button type="button" data-key="region">지역</button></th>
+        <th><button type="button" data-key="price">추정가격</button></th>
+        <th><button type="button" data-key="close">입찰마감</button></th>
+        <th><button type="button" data-key="posted">게시일</button></th>
+      </tr></thead>
+      <tbody id="body"></tbody>
+    </table>
+  </section>
+  <nav class="pager" id="pager" aria-label="페이지"></nav>
+  <textarea id="fallback" readonly aria-label="복사할 표"></textarea>
+</main>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(function(){
+const ORDER=['서울','경기','인천','강원','충북','충남','대전','세종','전북','광주·전남','경북','대구','경남','부산','울산','제주','미분류'];
+const METRO=['서울','경기','인천'];
+const PRE=[['광주시','경기'],['전남광주','광주·전남'],['BIFC','부산']];
+const PROV=[['서울','서울'],['경기도','경기'],['인천','인천'],['강원','강원'],['충청북도','충북'],['충북','충북'],['충청남도','충남'],['충남','충남'],['대전','대전'],['세종','세종'],['전북','전북'],['전라북도','전북'],['전남','광주·전남'],['전라남도','광주·전남'],['광주','광주·전남'],['경상북도','경북'],['경북','경북'],['대구','대구'],['경상남도','경남'],['경남','경남'],['부산','부산'],['울산','울산'],['제주','제주']];
+const CITY={
+ '경기':'수원 성남 고양 용인 부천 안산 안양 남양주 화성 평택 의정부 시흥 파주 김포 광명 군포 !하남 !오산 !이천 !여주 !구리 양주 동두천 !과천 !의왕 !안성 양평 가평 연천 포천',
+ '강원':'춘천 원주 강릉 !동해 !태백 속초 삼척 홍천 횡성 영월 평창 정선 철원 화천 양구 !인제 양양',
+ '충북':'청주 충주 제천 !보은 !옥천 !영동 증평 진천 괴산 !음성 단양',
+ '충남':'천안 !공주 보령 아산 서산 논산 계룡 당진 금산 !부여 서천 청양 홍성 !예산 태안',
+ '전북':'전주 군산 익산 정읍 남원 김제 완주 !진안 무주 !장수 임실 순창 고창 부안',
+ '광주·전남':'목포 여수 순천 나주 광양 담양 곡성 구례 고흥 보성 화순 장흥 강진 해남 완도 진도 함평 !영광 !장성 무안 신안',
+ '경북':'포항 경주 김천 안동 구미 !영주 영천 !상주 문경 경산 군위 의성 청송 !영양 영덕 !청도 !고령 !성주 칠곡 예천 봉화 울진 울릉',
+ '경남':'창원 진주 통영 사천 김해 밀양 거제 양산 의령 함안 창녕 !남해 하동 산청 함양 거창 합천'
+};
+const mk=t=>t[0]==='!'?new RegExp(t.slice(1)+'[시군]'):new RegExp(t);
+const PRE_RE=PRE.map(([k,r])=>[new RegExp(k),r]);
+const PROV_RE=PROV.map(([k,r])=>[new RegExp(k),r]);
+const CITY_RE=[];
+Object.keys(CITY).forEach(r=>CITY[r].split(' ').forEach(t=>CITY_RE.push([mk(t),r])));
+function earliest(text,list){let best=null;for(const [re,reg] of list){const m=re.exec(text);if(m&&(!best||m.index<best.i))best={i:m.index,reg};}return best&&best.reg;}
+function detect(r){
+  for(const t of [r.site,r.demand,r.org,r.title]){
+    if(!t)continue;
+    const g=earliest(t,PRE_RE)||earliest(t,PROV_RE)||earliest(t,CITY_RE);
+    if(g)return g;
+  }
+  return '미분류';
+}
+
+const $=id=>document.getElementById(id);
+const DAY=86400000, HOUR=3600000;
+const ts=s=>s?new Date(s.replace(' ','T')+'+09:00').getTime():NaN;
+const day=s=>(s||'').slice(0,16);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+
+let rows=[], updated='', loaded=false, AW={win:{},con:{}};
+let kws=store.get('bid-kw',['컨테이너','가설사무실','현장사무실','임시사무실','가설건축물','조립식','이동식','모듈러','가설울타리','임시화장실']);
+let overrides=store.get('region-override',{});
+let favs=store.get('bid-fav',{});
+const F={q:'',regions:new Set(),cats:new Set(),quick:new Set(),period:'open',price:0,favOnly:false};
+let sort={key:'posted',dir:-1}, page=1, psize=30;
+const expanded=new Set();
+
+const QUICK=[
+  ['won','낙찰결과 있음',r=>!!r.win],
+  ['b10','10억원 이상',r=>r.pn>=1e9],
+  ['today','24시간 내 신규',(r,n)=>n-r.tp<DAY&&n>=r.tp],
+  ['week','이번 주 마감',(r,n)=>r.tc>=n&&r.tc-n<7*DAY],
+  ['metro','수도권',r=>METRO.includes(r.region)],
+  ['big','1억원 이상',r=>r.pn>=1e8],
+  ['kw','렌탈 키워드 포함',r=>r.hits.length>0],
+  ['nosmall','소액수의 제외',r=>!r.small]
+];
+
+const CATS=['건축','토목','조경','전기','정보통신','기계설비','소방','기타'];
+const KIND_CAT=[[/실내건축|건축|금속창호|도장|방수|석공|철근|콘크리트|구조물해체|비계|철강구조물|석면|국가유산/,'건축'],[/토목|지반조성|포장|상.?하수도|수중|준설|철도/,'토목'],[/조경|산림|숲|국유림/,'조경'],[/소방/,'소방'],[/정보통신/,'정보통신'],[/전기/,'전기'],[/기계설비|가스|승강기|산업.?환경설비/,'기계설비']];
+const TITLE_CAT=[[/\(토목\)/,'토목'],[/\(건축\)/,'건축'],[/\(조경\)/,'조경'],[/\(전기\)/,'전기'],[/\(통신\)/,'정보통신'],[/\(기계\)|\(설비\)/,'기계설비'],[/\(소방\)/,'소방'],
+[/소방|스프링클러|화재/,'소방'],[/통신|CCTV|씨씨티비|방송설비|네트워크|정보화/,'정보통신'],[/전기|조명|LED|가로등|보안등|변압|수전|태양광|발전/,'전기'],
+[/기계|설비|배관|보일러|냉난방|공조|에어컨|급수|양수|펌프|승강기|엘리베이터|가스/,'기계설비'],[/조경|식재|수목|가로수|공원|녹지|숲|산림|생태|화단|놀이터/,'조경'],
+[/건축|리모델링|증축|신축|개축|보수공사|방수|도장|지붕|창호|내진|건물|청사|학교|교실|체육관|도서관|회관|복지관|어린이집|경로당|화장실|주택|숙소|관사|시설물|칸막이|인테리어|실내/,'건축'],
+[/도로|하천|하수|배수|포장|교량|옹벽|농로|보도|준설|정비|토목|수로|관로|하수도|상수도|급수|저수지|제방|사면|도시계획|산단|택지|교차로|터널|항만|어항|방파제|양수장|공사/,'토목']];
+function catOf(r){
+  const k=r.kind||'';
+  if(k){for(const [re,c] of KIND_CAT)if(re.test(k))return c;}
+  for(const [re,c] of TITLE_CAT)if(re.test(r.title))return c;
+  return '기타';
+}
+function prep(r){
+  r.cat=catOf(r);
+  r.tp=ts(r.posted);r.tc=ts(r.close);r.pn=Number(r.price)||0;
+  r.small=/소액|수의/.test(r.title);
+  r.auto=detect(r);
+  r.win=AW.win[r.id]||null;r.con=AW.con[(r.id||'').split('-')[0]]||null;
+}
+const region=r=>overrides[r.id]||r.auto;
+function hitsOf(r){const t=r.title+' '+r.org+' '+r.demand+' '+r.atts.map(a=>a.name).join(' ');return kws.filter(k=>k&&t.includes(k));}
+function refresh(){rows.forEach(r=>{r.region=region(r);r.hits=hitsOf(r);});}
+
+function passes(r,now,skip){
+  const wonOn=F.quick.has('won')||skip==='won';
+  if(F.period==='awarded'&&!r.win)return false;
+  if(F.period==='open'&&!wonOn&&!(isNaN(r.tc)||r.tc>=now))return false;
+  if(F.period==='today'&&!wonOn&&!(r.tc>=now&&r.tc-now<DAY))return false;
+  if(skip!=='region'&&F.regions.size&&!F.regions.has(r.region))return false;
+  if(skip!=='cat'&&F.cats.size&&!F.cats.has(r.cat))return false;
+  if(F.price&&r.pn<F.price)return false;
+  if(F.favOnly&&!favs[r.id])return false;
+  if(F.q){const t=(r.title+' '+r.org+' '+r.demand+' '+r.site).toLowerCase();if(!t.includes(F.q))return false;}
+  for(const [k,,fn] of QUICK){if(k!==skip&&F.quick.has(k)&&!fn(r,now))return false;}
+  return true;
+}
+
+function won(v){const n=Number(v);if(!n)return '-';if(n>=1e8){return (n/1e8).toFixed(2).replace(/\.?0+$/,'')+'억';}if(n>=1e4)return Math.round(n/1e4).toLocaleString('ko-KR')+'만';return n.toLocaleString('ko-KR');}
+function won2(v){const n=Number(v);return n?n.toLocaleString('ko-KR')+'원':'-';}
+const safeUrl=u=>/^https?:\/\//.test(u||'')?u:'';
+function toast(t){const el=$('toast');el.textContent=t;el.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>{el.hidden=true;},2200);}
+function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;}
+
+function compare(a,b){
+  const k=sort.key,d=sort.dir;
+  let x,y;
+  if(k==='region'){const c=ORDER.indexOf(a.region)-ORDER.indexOf(b.region);return c?c*d:(a.tc||9e15)-(b.tc||9e15);}
+  if(k==='price'){x=a.pn;y=b.pn;}
+  else if(k==='close'){x=a.tc||9e15;y=b.tc||9e15;}
+  else if(k==='posted'){x=a.tp||0;y=b.tp||0;}
+  else{return (a[k]||'').localeCompare(b[k]||'','ko')*d;}
+  return (x-y)*d;
+}
+
+function chip(label,n,pressed,onClick,title){
+  const b=el('button','pill');b.type='button';b.setAttribute('aria-pressed',String(pressed));
+  b.append(label);if(n!==null){b.append(el('span','n',n.toLocaleString('ko-KR')));}
+  if(title)b.title=title;b.addEventListener('click',onClick);return b;
+}
+
+function render(){
+  const now=Date.now();
+  // 칩 개수
+  const rc={};rows.forEach(r=>{if(passes(r,now,'region'))rc[r.region]=(rc[r.region]||0)+1;});
+  const rbox=$('regions');rbox.textContent='';
+  rbox.append(chip('전체',Object.values(rc).reduce((a,b)=>a+b,0),F.regions.size===0,()=>{F.regions.clear();page=1;render();}));
+  ORDER.forEach(g=>{if(rc[g]||F.regions.has(g))rbox.append(chip(g,rc[g]||0,F.regions.has(g),()=>{if(F.regions.has(g))F.regions.delete(g);else F.regions.add(g);page=1;render();}));});
+  const cc={};rows.forEach(r=>{if(passes(r,now,'cat'))cc[r.cat]=(cc[r.cat]||0)+1;});
+  const cbox=$('cats');cbox.textContent='';
+  const allb=el('label','cbx');const allc=document.createElement('input');allc.type='checkbox';allc.checked=F.cats.size===0;
+  allc.addEventListener('change',()=>{F.cats.clear();page=1;render();});
+  allb.append(allc,'전체 ',el('span','n',Object.values(cc).reduce((a,b)=>a+b,0).toLocaleString('ko-KR')));if(F.cats.size===0)allb.classList.add('on');cbox.append(allb);
+  CATS.forEach(g=>{
+    const lb=el('label','cbx'+(F.cats.has(g)?' on':''));const ck=document.createElement('input');ck.type='checkbox';ck.checked=F.cats.has(g);
+    ck.addEventListener('change',()=>{if(ck.checked)F.cats.add(g);else F.cats.delete(g);page=1;render();});
+    lb.append(ck,g+' ',el('span','n',(cc[g]||0).toLocaleString('ko-KR')));cbox.append(lb);
+  });
+
+  const list=rows.filter(r=>passes(r,now)).sort(compare);
+  render.last=list;
+  const pages=Math.max(1,Math.ceil(list.length/psize));
+  if(page>pages)page=pages;
+  const slice=list.slice((page-1)*psize,page*psize);
+
+  const body=$('body');body.textContent='';
+  if(!slice.length){
+    const tr=el('tr');const c=el('td','empty',!loaded?'불러오는 중입니다.':(rows.length?'조건에 맞는 공고가 없습니다.':'아직 모인 공고가 없습니다. 자동 수집이 돌고 나면 여기에 나타납니다.'));
+    c.colSpan=6;tr.append(c);body.append(tr);
+  }
+  slice.forEach(r=>body.append(...rowEls(r,now)));
+  document.querySelectorAll('thead button').forEach(b=>{
+    if(b.dataset.key===sort.key)b.setAttribute('aria-sort',sort.dir>0?'ascending':'descending');else b.removeAttribute('aria-sort');
+  });
+  $('total').replaceChildren('조건에 맞는 공고 ',(()=>{const b=el('b',null,list.length.toLocaleString('ko-KR'));return b;})(),' 건 / 누적 '+rows.length.toLocaleString('ko-KR')+'건');
+  $('topstat').textContent=updated?'마지막 갱신 '+day(updated.replace('T',' '))+' · 매일 아침 자동 수집':'';
+  renderPager(pages);
+}
+
+
+const fmtBiz=b=>{b=String(b||'').replace(/\D/g,'');return b.length===10?b.slice(0,3)+'-'+b.slice(3,5)+'-'+b.slice(5):b;};
+function copyBtn(text){
+  const b=el('button','mini','복사');b.type='button';
+  b.addEventListener('click',()=>{try{navigator.clipboard.writeText(text).then(()=>toast('복사했습니다: '+text),()=>toast('복사하지 못했습니다'));}catch(e){toast('복사하지 못했습니다');}});
+  return b;
+}
+function bizLink(biz,label){
+  const d=String(biz||'').replace(/\D/g,'');if(d.length!==10)return null;
+  const a=el('a','mini',label);a.href='https://bizno.net/article/'+d;a.target='_blank';a.rel='noopener noreferrer';
+  a.style.cssText='border:1px solid var(--line);border-radius:6px;background:var(--surface);text-decoration:none';return a;
+}
+function line(box,k,content){
+  const d=el('div','ln');d.append(el('b',null,k));
+  if(content instanceof Node)d.append(content);else d.append(el('span',null,content||'-'));
+  box.append(d);
+}
+function contactLines(box,c,biz){
+  line(box,'사업자번호',(()=>{const s=el('span',null,fmtBiz(biz)||'-');if(biz){s.append(' ',copyBtn(fmtBiz(biz)));}return s;})());
+  line(box,'주소',c&&c.a);
+  const tw=el('span');
+  if(c&&c.t){const a=el('a',null,c.t);a.href='tel:'+c.t.replace(/[^0-9+]/g,'');tw.append(a,' ',copyBtn(c.t));}else tw.textContent='-';
+  line(box,'전화',tw);
+  const fx=el('span');const bl=bizLink(biz,'팩스·상세 보기(비즈노)');
+  if(bl)fx.append(bl);else fx.textContent='-';
+  line(box,'팩스',fx);
+}
+function resultBox(r,now){
+  const wrap=el('div');
+  const opened=!isNaN(ts(r.open))&&ts(r.open)<=now;
+  if(!r.win&&!r.con){
+    const n=el('div','note');
+    if(!opened)n.textContent='아직 개찰 전입니다. 개찰 '+(r.open?r.open.slice(0,16)+' 예정':'일정 미정')+' · 낙찰업체는 개찰 후 1~3일 안에 나라장터에 등록되면 자동으로 이곳에 나타납니다.';
+    else n.textContent='개찰은 끝났고 낙찰 결과가 나라장터에 등록되기를 기다리는 중입니다(보통 1~3일). 등록되면 하루 두 번(09:30, 15:30) 자동으로 채워집니다.';
+    wrap.append(n);return wrap;
+  }
+  const box=el('div','res');
+  // 낙찰업체
+  const wc=el('div','rc win');
+  const wh=el('div','hd');wh.append('낙찰업체 ',el('span','tag ok','1순위 낙찰'));wc.append(wh);
+  if(r.win){
+    wc.append(el('div','nm',r.win.n||'-'));
+    line(wc,'대표자',r.win.c);
+    contactLines(wc,r.win,r.win.b);
+    line(wc,'낙찰금액',r.win.amt?won2(r.win.amt)+(r.win.rate?' ('+Number(r.win.rate).toFixed(3).replace(/0+$/,'').replace(/\.$/,'')+'%)':''):'-');
+    line(wc,'낙찰일',r.win.d);
+    if(r.win.np)line(wc,'참여업체',r.win.np+'개사');
+  }else wc.append(el('div','note','낙찰업체 정보가 아직 없습니다.'));
+  // 계약업체
+  const cc=el('div','rc con');
+  const ch=el('div','hd');ch.append('계약업체 ');cc.append(ch);
+  if(r.con){
+    const main=r.con.corps.find(x=>/주계약/.test(x.role))||r.con.corps[0];
+    const same=r.win&&r.con.corps.some(x=>x.biz&&x.biz===r.win.b);
+    if(r.win&&!same){cc.classList.add('diff');ch.append(el('span','tag diff','낙찰업체와 다른 업체가 계약'));}
+    else if(same)ch.append(el('span','tag same','낙찰업체와 동일'));
+    cc.append(el('div','nm',r.con.corps.map(x=>x.name).join(', ')));
+    line(cc,'대표자',r.con.corps.map(x=>x.ceo).filter(Boolean).join(', '));
+    const useWin=same&&r.win&&main&&main.biz===r.win.b;
+    contactLines(cc,useWin?r.win:null,main&&main.biz);
+    if(r.con.corps.length>1)line(cc,'공동수급',r.con.corps.map(x=>x.name+(x.share?' '+x.share+'%':'')).join(' / '));
+    line(cc,'계약금액',r.con.amt?won2(r.con.amt):'-');
+    line(cc,'계약일',r.con.date);
+    if(r.win&&!same)cc.append(el('div','note','낙찰업체의 서류 미비 등으로 다른 순위 업체가 계약했을 수 있습니다. 위 낙찰업체와 비교해 보세요.'));
+  }else cc.append(el('div','note',r.win?'아직 계약이 등록되지 않았습니다. 낙찰 후 계약까지는 보통 1~3주가 걸리며, 등록되면 자동으로 나타납니다.':'계약 정보가 아직 없습니다.'));
+  box.append(wc,cc);wrap.append(box);return wrap;
+}
+
+function rowEls(r,now){
+  const tr=el('tr','main');
+  tr.addEventListener('click',e=>{if(e.target.closest('a,button'))return;if(String(window.getSelection&&window.getSelection()).length>0)return;if(expanded.has(r.id))expanded.delete(r.id);else expanded.add(r.id);render();});
+  const ct=el('td','title');
+  const t=el('div');
+  if(now-r.tp<DAY&&now>=r.tp)t.append(el('span','new','NEW'));
+  t.append(r.title);ct.append(t);
+  if(r.win){const w=el('div','wn','낙찰 · '+r.win.n);ct.append(w);}
+  if(r.hits.length){const w=el('div','kws');r.hits.forEach(h=>w.append(el('span','kw',h)));ct.append(w);}
+  const co=el('td',null,r.demand&&r.demand!==r.org?r.demand:r.org);
+  if(r.demand&&r.demand!==r.org)co.append(el('div','sitetxt','공고: '+r.org));
+  const cr=el('td');cr.append(el('span','region',r.region));cr.append(' ',el('span','kw',r.cat));if(r.site)cr.append(el('div','sitetxt',r.site));
+  const cp=el('td','mono',won(r.price));
+  const cd=el('td');
+  const ended=r.tc<now, left=r.tc-now, soon=!ended&&left<3*DAY;
+  const dd=el('div','dd');
+  let lab='-';
+  if(!isNaN(r.tc)){lab=ended?'마감':(left<DAY?'D-day':'D-'+Math.ceil(left/DAY));}
+  dd.append(el('div','lab'+(ended?' done':soon?' soon':''),lab+' · '+(r.close||'').slice(5,16)));
+  const pct=isNaN(r.tc)||isNaN(r.tp)||r.tc<=r.tp?0:Math.max(0,Math.min(100,(now-r.tp)/(r.tc-r.tp)*100));
+  const bar=el('div','bar'+(ended?' done':soon?' soon':''));const sp=el('span');sp.style.width=(ended?100:pct)+'%';bar.append(sp);dd.append(bar);
+  cd.append(dd);
+  const cg=el('td','mono',(r.posted||'').slice(5,16));
+  tr.append(ct,co,cr,cp,cd,cg);
+  const out=[tr];
+  if(expanded.has(r.id)){
+    const dr=el('tr','det');const dc=el('td');dc.colSpan=6;
+    dc.append(resultBox(r,now));
+    const g=el('div','dgrid');
+    const add=(k,v)=>{const d=el('div');d.append(el('div','k',k),el('div','v',v||'-'));g.append(d);};
+    add('담당자',[r.contact,r.tel].filter(Boolean).join(' · '));
+    add('계약방법',r.method);add('입찰방식',r.bidtype);add('낙찰방법',r.winner);
+    add('주된 공종',r.kind);add('추정가격',won2(r.price));add('배정예산',won2(r.budget));
+    add('입찰마감',r.close);add('개찰일시',r.open);add('공고번호',r.id);
+    const sel=el('select');sel.setAttribute('aria-label','지역 직접 바꾸기');
+    ORDER.forEach(o=>{const op=el('option',null,o);op.value=o;if(o===r.region)op.selected=true;sel.append(op);});
+    sel.addEventListener('change',()=>{if(sel.value===r.auto)delete overrides[r.id];else overrides[r.id]=sel.value;store.set('region-override',overrides);refresh();render();});
+    const rd=el('div');rd.append(el('div','k','지역이 틀렸다면 직접 바꾸기'),sel);g.append(rd);
+    dc.append(g);
+    const u=safeUrl(r.url);
+    if(u){const a=el('a',null,'나라장터에서 공고 보기');a.href=u;a.target='_blank';a.rel='noopener';dc.append(a);}
+    if(r.atts.length){
+      const w=el('div','atts');w.style.marginTop='8px';
+      r.atts.forEach(x=>{const au=safeUrl(x.url);if(!au)return;const l=el('a',null,'첨부 '+x.name);l.href=au;l.target='_blank';l.rel='noopener';w.append(l);});
+      dc.append(w);
+    }
+    dr.append(dc);out.push(dr);
+  }
+  return out;
+}
+
+function renderPager(pages){
+  const p=$('pager');p.textContent='';
+  if(pages<=1)return;
+  const b=(label,pg,dis,cur)=>{const x=el('button',null,label);x.type='button';x.disabled=!!dis;if(cur)x.setAttribute('aria-current','page');x.addEventListener('click',()=>{page=pg;render();window.scrollTo({top:0});});return x;};
+  p.append(b('‹',page-1,page<=1));
+  let s=Math.max(1,page-2),e=Math.min(pages,s+4);s=Math.max(1,e-4);
+  if(s>1){p.append(b('1',1));if(s>2)p.append(el('span','lbl','…'));}
+  for(let i=s;i<=e;i++)p.append(b(String(i),i,false,i===page));
+  if(e<pages){if(e<pages-1)p.append(el('span','lbl','…'));p.append(b(String(pages),pages));}
+  p.append(b('›',page+1,page>=pages));
+}
+
+// 헤더 정렬
+document.querySelectorAll('thead button').forEach(btn=>btn.addEventListener('click',()=>{
+  const k=btn.dataset.key;
+  if(sort.key===k)sort.dir*=-1;else{sort={key:k,dir:(k==='price'||k==='posted')?-1:1};}
+  page=1;render();
+}));
+// 검색·필터
+let qt;
+$('q').addEventListener('input',e=>{clearTimeout(qt);qt=setTimeout(()=>{F.q=e.target.value.trim().toLowerCase();page=1;render();},150);});
+$('period').addEventListener('change',e=>{F.period=e.target.value;page=1;render();});
+$('price').addEventListener('change',e=>{F.price=Number(e.target.value);page=1;render();});
+$('psize').addEventListener('change',e=>{psize=Number(e.target.value);page=1;render();});
+// 다운로드
+function tableRows(){
+  return [['지역','공종','공고명','수요기관','공사현장','추정가격','입찰마감','게시일','담당자','전화','공고링크','낙찰업체','낙찰사업자번호','낙찰업체주소','낙찰업체전화','낙찰금액','계약업체','계약사업자번호']]
+   .concat((render.last||[]).map(r=>[r.region,r.cat,r.title,r.demand||r.org,r.site,r.price,r.close,r.posted,r.contact,r.tel,r.url,r.win?r.win.n:'',r.win?fmtBiz(r.win.b):'',r.win?r.win.a:'',r.win?r.win.t:'',r.win?r.win.amt:'',r.con?r.con.corps.map(x=>x.name).join(' / '):'',r.con?r.con.corps.map(x=>fmtBiz(x.biz)).join(' / '):'']));
+}
+$('dl').addEventListener('click',()=>{
+  const data=tableRows();
+  if(data.length<2){toast('내려받을 목록이 없습니다');return;}
+  const csv='﻿'+data.map(r=>r.map(c=>'"'+String(c==null?'':c).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='remarket-bids-'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.append(a);a.click();a.remove();
+  toast((data.length-1)+'건을 내려받았습니다');
+});
+
+// ================= 낙찰·계약 업체 화면 =================
+const G={q:'',regions:new Set(),cats:new Set(),days:7,min:0,con:'all',sort:'date'};
+let A=[],aopen=new Set(),apage=1,apsize=30,view=store.get('bid-view','awards');
+const noOf=id=>(id||'').split('-')[0];
+const kstDay=n=>new Date(Date.now()+9*HOUR-n*DAY).toISOString().slice(0,10);
+function buildA(){
+  const idx={};rows.forEach(r=>{idx[r.id]=r;});
+  A=Object.entries(AW.win).map(([id,w])=>{
+    const r=idx[id]||null,con=AW.con[noOf(id)]||null;
+    const title=(w.nm||(r&&r.title)||'').trim(),org=w.dm||(r&&(r.demand||r.org))||'';
+    const region=r?r.region:(overrides[id]||detect({site:'',demand:org,org:org,title:title}));
+    const cat=r?r.cat:catOf({kind:'',title:title});
+    const same=!!(con&&con.corps.some(x=>x.biz&&x.biz===w.b));
+    return {id,w,r,con,title,org,region,cat,same,amt:Number(w.amt)||0,date:w.d||'',url:r?safeUrl(r.url):''};
+  });
+}
+function aPass(a,skip){
+  if(G.days>=0&&!(a.date>=kstDay(G.days)))return false;
+  if(skip!=='region'&&G.regions.size&&!G.regions.has(a.region))return false;
+  if(skip!=='cat'&&G.cats.size&&!G.cats.has(a.cat))return false;
+  if(G.min&&a.amt<G.min)return false;
+  if(G.con==='done'&&!a.con)return false;
+  if(G.con==='wait'&&a.con)return false;
+  if(G.con==='diff'&&!(a.con&&!a.same))return false;
+  if(G.q){
+    const t=[a.w.n,a.title,a.org,a.w.c,a.w.a,a.w.b,a.con?a.con.corps.map(x=>x.name+' '+x.biz).join(' '):''].join(' ').toLowerCase();
+    const qd=G.q.replace(/\D/g,'');
+    if(!t.includes(G.q)&&!(qd.length>=3&&((a.w.t||'').replace(/\D/g,'').includes(qd))))return false;
+  }
+  return true;
+}
+function compBlock(kind,c){
+  const b=el('div','box '+kind);
+  b.append(el('div','cn',c.name||'-'));
+  b.append(el('div','cs',[c.ceo&&('대표 '+c.ceo),c.biz&&('사업자 '+fmtBiz(c.biz))].filter(Boolean).join(' · ')));
+  const tl=el('div','cl');tl.append(el('i',null,'☎'));if(c.tel||c.addr)tl.title='조달청(나라장터)에 등록된 정보';
+  if(c.tel){const a=el('a','tel',c.tel);a.href='tel:'+c.tel.replace(/[^0-9+]/g,'');tl.append(a);}else tl.append(el('span',null,'-'));
+  b.append(tl);
+  const al=el('div','cl');al.append(el('i',null,'⌂'),el('span',null,c.addr||'-'));b.append(al);
+  if(c.tel||c.addr)b.append(el('div','src','※ 조달청(나라장터) 등록 정보'));
+  const acts=el('div','acts');
+  if(c.tel||c.addr){
+    const cb=el('button',null,'연락처 복사');cb.type='button';
+    cb.addEventListener('click',()=>{const t=[c.name,c.tel,c.addr].filter(Boolean).join(' / ');try{navigator.clipboard.writeText(t).then(()=>toast('복사했습니다'),()=>toast('복사하지 못했습니다'));}catch(e){toast('복사하지 못했습니다');}});
+    acts.append(cb);
+  }
+  const bl=bizLink(c.biz,'비즈노에서 전화·팩스 확인 ↗');if(bl){bl.className='pri';bl.style.cssText='';acts.append(bl);}
+  if(acts.children.length)b.append(acts);
+  return b;
+}
+function aRow(a){
+  const item=el('div','item'+(aopen.has(a.id)?' open':''));
+  const hd=el('div','ihd');hd.tabIndex=0;hd.setAttribute('role','button');hd.setAttribute('aria-expanded',String(aopen.has(a.id)));
+  hd.append(el('span','dt',(a.date||'').slice(5)),el('span','tt',a.title||'(공고명 없음)'),el('span','chev','▼'));
+  const tgl=()=>{if(String(window.getSelection&&window.getSelection()).length>0)return;if(aopen.has(a.id))aopen.delete(a.id);else aopen.add(a.id);renderA();};
+  hd.addEventListener('click',tgl);hd.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tgl();}});
+  item.append(hd);
+  if(!aopen.has(a.id))return item;
+  const body=el('div','ibody');const row=el('div','arow');
+  // 공고
+  const c1=el('div','ac');c1.append(el('div','lab','공고'));
+  const top=el('div');top.style.marginBottom='6px';top.append(el('span','dchip','낙찰 '+(a.date||'')));c1.append(top);
+  const mt=el('div','ameta');mt.append(el('span','region',a.region),el('span','cat',a.cat),a.org);c1.append(mt);
+  const am=el('div','aamt');am.append('낙찰금액 ',el('b',null,a.amt?won(a.amt):'-'));
+  const ex=[a.w.rate?Number(a.w.rate).toFixed(2)+'%':'',a.w.np?'참여 '+a.w.np+'개사':''].filter(Boolean).join(' · ');
+  if(ex)am.append('  '+ex);c1.append(am);
+  if(a.url){const l=el('div','acts');const x=el('a',null,'나라장터 공고');x.href=a.url;x.target='_blank';x.rel='noopener';l.append(x);c1.append(l);}
+  // 낙찰업체
+  const c2=el('div','ac');c2.append(el('div','lab','낙찰업체 (1순위)'));
+  c2.append(compBlock('win',{name:a.w.n,ceo:a.w.c,biz:a.w.b,tel:a.w.t,addr:a.w.a}));
+  // 계약업체
+  const c3=el('div','ac');c3.append(el('div','lab','계약업체'));
+  if(a.con){
+    const m=a.con.corps.find(x=>/주계약/.test(x.role))||a.con.corps[0];
+    const useW=a.same&&m.biz===a.w.b;
+    const bx=compBlock('con'+(a.same?'':' diff'),{name:a.con.corps.map(x=>x.name).join(', '),ceo:a.con.corps.map(x=>x.ceo).filter(Boolean).join(', '),biz:m.biz,tel:useW?a.w.t:'',addr:useW?a.w.a:''});
+    const tg=el('div','ameta');tg.style.marginBottom='6px';
+    tg.append(el('span','tag '+(a.same?'same':'diff'),a.same?'낙찰업체와 동일':'낙찰업체와 다른 업체'),'계약일 '+(a.con.date||'-')+(a.con.amt?' · '+won(a.con.amt):''));
+    bx.prepend(tg);
+    if(!a.same)bx.append(el('div','cs','낙찰업체의 서류 미비 등으로 다른 업체가 계약했을 수 있습니다. 연락처는 비즈노에서 확인하세요.'));
+    c3.append(bx);
+  }else c3.append(el('div','box empty','계약 대기 중입니다. 낙찰 후 1~3주 뒤에 등록되면 자동으로 표시됩니다.'));
+  row.append(c1,c2,c3);body.append(row);item.append(body);return item;
+}
+function renderA(){
+  // 칩들
+  const rc={},cc={};A.forEach(a=>{if(aPass(a,'region'))rc[a.region]=(rc[a.region]||0)+1;if(aPass(a,'cat'))cc[a.cat]=(cc[a.cat]||0)+1;});
+  const rb=$('a-regions');rb.textContent='';
+  rb.append(chip('전체',Object.values(rc).reduce((x,y)=>x+y,0),G.regions.size===0,()=>{G.regions.clear();apage=1;renderA();}));
+  ORDER.forEach(g=>{if(rc[g]||G.regions.has(g))rb.append(chip(g,rc[g]||0,G.regions.has(g),()=>{if(G.regions.has(g))G.regions.delete(g);else G.regions.add(g);apage=1;renderA();}));});
+  const cb=$('a-cats');cb.textContent='';
+  const allb=el('label','cbx'+(G.cats.size===0?' on':''));const allc=document.createElement('input');allc.type='checkbox';allc.checked=G.cats.size===0;
+  allc.addEventListener('change',()=>{G.cats.clear();apage=1;renderA();});allb.append(allc,'전체 ',el('span','n',Object.values(cc).reduce((x,y)=>x+y,0).toLocaleString('ko-KR')));cb.append(allb);
+  CATS.forEach(g=>{
+    const lb=el('label','cbx'+(G.cats.has(g)?' on':''));const ck=document.createElement('input');ck.type='checkbox';ck.checked=G.cats.has(g);
+    ck.addEventListener('change',()=>{if(ck.checked)G.cats.add(g);else G.cats.delete(g);apage=1;renderA();});
+    lb.append(ck,g+' ',el('span','n',(cc[g]||0).toLocaleString('ko-KR')));cb.append(lb);
+  });
+  // 목록
+  const list=A.filter(a=>aPass(a));
+  list.sort(G.sort==='amt'?(x,y)=>y.amt-x.amt:(x,y)=>(y.date.localeCompare(x.date))||(y.amt-x.amt));
+  renderA.last=list;
+  // KPI
+  const sum=list.reduce((t,a)=>t+a.amt,0),done=list.filter(a=>a.con).length,diff=list.filter(a=>a.con&&!a.same).length;
+  const biz=new Set(list.map(a=>a.w.b).filter(Boolean)).size;
+  const k=$('a-kpis');k.textContent='';
+  [['낙찰 공고',list.length.toLocaleString('ko-KR'),'건'],['낙찰금액 합계',won(sum),'원'],['계약 완료',done.toLocaleString('ko-KR'),'건'+(list.length?' ('+Math.round(done/list.length*100)+'%)':'')+(diff?' · 다른 업체 '+diff:'')],['낙찰업체 수',biz.toLocaleString('ko-KR'),'곳']].forEach(([t,v,u])=>{
+    const d=el('div','kpi');d.append(el('div','k',t));const vv=el('div','v',v);vv.append(el('small',null,u));d.append(vv);k.append(d);
+  });
+  $('a-total').replaceChildren('조건에 맞는 낙찰 ',el('b',null,list.length.toLocaleString('ko-KR')),' 건');
+  const pages=Math.max(1,Math.ceil(list.length/apsize));if(apage>pages)apage=pages;
+  const box=$('a-list');box.textContent='';
+  if(!list.length){box.append(el('div','card empty',loaded?'조건에 맞는 낙찰 결과가 없습니다. 기간을 늘려 보세요.':'불러오는 중입니다.'));}
+  list.slice((apage-1)*apsize,apage*apsize).forEach(a=>box.append(aRow(a)));
+  const p=$('a-pager');p.textContent='';
+  if(pages>1){
+    const b=(label,pg,dis,cur)=>{const x=el('button',null,label);x.type='button';x.disabled=!!dis;if(cur)x.setAttribute('aria-current','page');x.addEventListener('click',()=>{apage=pg;renderA();window.scrollTo({top:0});});return x;};
+    p.append(b('‹',apage-1,apage<=1));
+    let st=Math.max(1,apage-2),e=Math.min(pages,st+4);st=Math.max(1,e-4);
+    for(let i=st;i<=e;i++)p.append(b(String(i),i,false,i===apage));
+    p.append(b('›',apage+1,apage>=pages));
+  }
+}
+$('a-q').addEventListener('input',e=>{clearTimeout(qt);qt=setTimeout(()=>{G.q=e.target.value.trim().toLowerCase();apage=1;renderA();},150);});
+$('a-days').addEventListener('change',e=>{G.days=Number(e.target.value);apage=1;renderA();});
+$('a-min').addEventListener('change',e=>{G.min=Number(e.target.value);apage=1;renderA();});
+$('a-con').addEventListener('change',e=>{G.con=e.target.value;apage=1;renderA();});
+$('a-sort').addEventListener('change',e=>{G.sort=e.target.value;apage=1;renderA();});
+$('a-psize').addEventListener('change',e=>{apsize=Number(e.target.value);apage=1;renderA();});
+$('a-dl').addEventListener('click',()=>{
+  const list=renderA.last||[];if(!list.length){toast('내려받을 목록이 없습니다');return;}
+  const head=['낙찰일','공고명','발주기관','지역','공종','낙찰금액','낙찰률','낙찰업체','대표자','사업자번호','전화','주소','계약업체','계약사업자번호','계약일','계약금액','낙찰·계약 동일','공고링크'];
+  const data=[head].concat(list.map(a=>[a.date,a.title,a.org,a.region,a.cat,a.amt||'',a.w.rate,a.w.n,a.w.c,fmtBiz(a.w.b),a.w.t,a.w.a,a.con?a.con.corps.map(x=>x.name).join(' / '):'',a.con?a.con.corps.map(x=>fmtBiz(x.biz)).join(' / '):'',a.con?a.con.date:'',a.con?a.con.amt:'',a.con?(a.same?'동일':'다름'):'',a.url]));
+  const csv='﻿'+data.map(r=>r.map(c=>'"'+String(c==null?'':c).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  const u=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  const l=document.createElement('a');l.href=u;l.download='낙찰업체_'+kstDay(0)+'.csv';document.body.append(l);l.click();l.remove();
+});
+function setView(v){
+  view=v;store.set('bid-view',v);
+  $('v-awards').hidden=v!=='awards';$('v-bids').hidden=v!=='bids';
+  $('tab-a').setAttribute('aria-pressed',String(v==='awards'));$('tab-b').setAttribute('aria-pressed',String(v==='bids'));
+  $('topstat').textContent=updated?'마지막 갱신 '+day(updated.replace('T',' '))+' · 매일 아침 자동 수집':'';
+  if(v==='awards'){buildA();renderA();}else render();
+}
+$('tab-a').addEventListener('click',()=>setView('awards'));
+$('tab-b').addEventListener('click',()=>setView('bids'));
+
+
+// ================= 로그인(비밀번호) · 데이터 읽기 =================
+const MAGIC=new Uint8Array([82,77,75,49]);
+async function openEnc(buf,pw){
+  const u=new Uint8Array(buf);
+  for(let i=0;i<4;i++)if(u[i]!==MAGIC[i])throw new Error('format');
+  const salt=u.slice(4,20),iv=u.slice(20,32),ct=u.slice(32);
+  const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
+  const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:200000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
+  let plain;
+  try{plain=await crypto.subtle.decrypt({name:'AES-GCM',iv,additionalData:MAGIC},key,ct);}catch(e){const x=new Error('pw');x.pw=true;throw x;}
+  const text=await new Response(new Blob([plain]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+  return JSON.parse(text);
+}
+// 암호화 파일이 있으면 비밀번호로 열고, 없으면(임시 평문 상태) 그대로 읽습니다.
+async function readData(name,pw,optional){
+  const r=await fetch(name+'.enc?'+Date.now());
+  if(r.ok){if(!pw){const x=new Error('need');x.need=true;throw x;}return openEnc(await r.arrayBuffer(),pw);}
+  const p=await fetch(name+'.json?'+Date.now());
+  if(p.ok)return p.json();
+  if(optional)return null;
+  throw new Error('missing');
+}
+let locked=false;
+function showGate(msg){
+  document.body.classList.add('locked');$('gate').hidden=false;$('gerr').textContent=msg||'';
+  setTimeout(()=>$('gpw').focus(),0);
+}
+async function boot(pw){
+  const d=await readData('data',pw,false);
+  const a=await readData('awards',pw,true);
+  if(a&&a.win)AW=a;
+  rows=(d.items||[]).map(r=>Object.assign({atts:[],site:'',demand:'',org:'',title:'',close:'',open:'',posted:'',price:'',budget:'',url:'',contact:'',tel:'',method:'',bidtype:'',winner:'',kind:''},r));
+  rows.forEach(prep);refresh();updated=d.updated||'';loaded=true;
+  document.body.classList.remove('locked');$('gate').hidden=true;
+  setView(view);
+}
+function tryBoot(pw,remember){
+  $('gbtn').disabled=true;$('gerr').textContent='';
+  return boot(pw).then(()=>{
+    try{sessionStorage.setItem('rm-pw',pw);if(remember)localStorage.setItem('rm-pw',pw);}catch(e){}
+    if(locked)$('logout').hidden=false;
+  }).catch(e=>{
+    try{sessionStorage.removeItem('rm-pw');localStorage.removeItem('rm-pw');}catch(x){}
+    if(e&&(e.pw||e.need))showGate(e.pw?'비밀번호가 맞지 않습니다.':'');
+    else{showGate('데이터를 불러오지 못했습니다. 잠시 뒤 다시 시도해 주세요.');}
+  }).finally(()=>{$('gbtn').disabled=false;});
+}
+$('gform').addEventListener('submit',e=>{e.preventDefault();const pw=$('gpw').value;if(pw)tryBoot(pw,$('grm').checked);});
+$('logout').addEventListener('click',()=>{try{sessionStorage.removeItem('rm-pw');localStorage.removeItem('rm-pw');}catch(e){}location.reload();});
+(async()=>{
+  let saved='';try{saved=sessionStorage.getItem('rm-pw')||localStorage.getItem('rm-pw')||'';}catch(e){}
+  let enc=false;try{enc=(await fetch('data.enc?'+Date.now(),{method:'HEAD'})).ok;}catch(e){}
+  locked=enc;
+  if(enc&&!saved){showGate('');return;}
+  await tryBoot(saved,false);
+})();
+})();
+</script>
+</body>
+</html>
