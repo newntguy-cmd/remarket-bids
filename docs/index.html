@@ -190,6 +190,10 @@ body.locked .top,body.locked .view{display:none}
 <script data-goatcounter="https://remarket-bids.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
 <body class="locked">
+<div id="statov" style="display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.55);padding:3vh 3vw">
+<div style="background:#fff;border-radius:10px;height:100%;display:flex;flex-direction:column;overflow:hidden">
+<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid #ddd;font-size:14px"><b>방문 통계 (시간대별은 오른쪽 위 View by: hour)</b><span><a href="https://remarket-bids.goatcounter.com" target="_blank" rel="noopener" style="margin-right:14px">새 창으로 열기</a><button type="button" id="statx" style="border:1px solid #bbb;background:#fff;border-radius:6px;padding:3px 10px;cursor:pointer">닫기</button></span></div>
+<iframe id="statf" style="flex:1;border:0;width:100%" title="방문 통계"></iframe></div></div>
 <div id="gate" hidden>
   <form class="gbox" id="gform">
     <h1>리마켓 입찰 레이더</h1>
@@ -203,7 +207,7 @@ body.locked .top,body.locked .view{display:none}
 <header class="top"><div class="in">
   <div class="brand">리마켓 입찰 레이더<small>나라장터 공사 · 낙찰/계약 영업 레이더</small></div>
   <div class="tabs" role="tablist"><button type="button" id="tab-a" aria-pressed="true">낙찰·계약 업체</button><button type="button" id="tab-b" aria-pressed="false">입찰공고</button></div>
-  <div class="topstat" id="topstat"></div><a class="logout" id="stats" href="https://remarket-bids.goatcounter.com" target="_blank" rel="noopener" style="text-decoration:none" hidden>방문통계</a> <button type="button" class="logout" id="logout" hidden>로그아웃</button>
+  <div class="topstat" id="topstat"></div><button type="button" class="logout" id="stats" hidden>방문통계</button> <button type="button" class="logout" id="logout" hidden>로그아웃</button>
 </div></header>
 
 <main class="view" id="v-awards">
@@ -807,6 +811,7 @@ function tryBoot(pw,remember){
   }).finally(()=>{$('gbtn').disabled=false;});
 }
 $('gform').addEventListener('submit',e=>{e.preventDefault();const pw=$('gpw').value;if(pw)tryBoot(pw,$('grm').checked);});
+$('stats').addEventListener('click',()=>{$('statf').src='https://remarket-bids.goatcounter.com/';$('statov').style.display='block';});$('statx').addEventListener('click',()=>{$('statov').style.display='none';});
 $('logout').addEventListener('click',()=>{try{sessionStorage.removeItem('rm-pw');localStorage.removeItem('rm-pw');}catch(e){}location.reload();});
 (async()=>{
   let saved='';try{saved=sessionStorage.getItem('rm-pw')||localStorage.getItem('rm-pw')||'';}catch(e){}
