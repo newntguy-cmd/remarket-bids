@@ -16,6 +16,9 @@ try:
 except urllib.error.HTTPError as e:
     sys.exit(f"통계 조회 실패: HTTP {e.code} {e.read()[:300]!r} (토큰 길이 {len(tok)})")
 print("응답 키:", list(d.keys()), "일수:", len(d.get("stats", [])))
+for s_ in d.get("stats", [])[-3:]:
+    print("원본", s_.get("day"), s_.get("hourly"), "합계", s_.get("daily"))
+print("시각", end.isoformat())
 days = [{"day": s["day"], "hourly": s.get("hourly", [])} for s in d.get("stats", [])]
 rmcrypt.save("stats", {"updated": end.isoformat(), "total": d.get("total"), "days": days})
 print("저장 완료")
