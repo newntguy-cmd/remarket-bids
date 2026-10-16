@@ -1,0 +1,35 @@
+name: collect-stats
+
+on:
+  schedule:
+    - cron: "10 * * * *"   # 매 시간 방문 통계 갱신
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stats
+
+jobs:
+  stats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install cryptography
+      - name: Fetch stats
+        env:
+          GOATCOUNTER_TOKEN: ${{ secrets.GOATCOUNTER_TOKEN }}
+          SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}
+        run: python fetch_stats.py
+      - name: Commit
+        run: |
+          git config user.name "bid-bot"
+          git config user.email "bid-bot@users.noreply.github.com"
+          git add docs/stats.enc
+          git diff --cached --quiet && exit 0
+          git commit -m "update stats"
+          for i in 1 2 3; do git pull -q --rebase && git push && break; sleep 5; done

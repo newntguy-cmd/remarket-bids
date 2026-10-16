@@ -190,10 +190,10 @@ body.locked .top,body.locked .view{display:none}
 <script data-goatcounter="https://remarket-bids.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
 <body class="locked">
-<div id="statov" style="display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.55);padding:3vh 3vw">
-<div style="background:#fff;border-radius:10px;height:100%;display:flex;flex-direction:column;overflow:hidden">
-<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid #ddd;font-size:14px"><b>방문 통계 (시간대별은 오른쪽 위 View by: hour)</b><span><a href="https://remarket-bids.goatcounter.com" target="_blank" rel="noopener" style="margin-right:14px">새 창으로 열기</a><button type="button" id="statx" style="border:1px solid #bbb;background:#fff;border-radius:6px;padding:3px 10px;cursor:pointer">닫기</button></span></div>
-<iframe id="statf" style="flex:1;border:0;width:100%" title="방문 통계"></iframe></div></div>
+<div id="statov" style="display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.55);padding:4vh 3vw;overflow:auto">
+<div style="background:#fff;border-radius:10px;max-width:860px;margin:0 auto;padding:16px 20px;color:#222">
+<div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:16px">방문 통계</b><button type="button" id="statx" style="border:1px solid #bbb;background:#fff;border-radius:6px;padding:3px 10px;cursor:pointer">닫기</button></div>
+<div id="statbody" style="margin-top:12px;font-size:14px">불러오는 중…</div></div></div>
 <div id="gate" hidden>
   <form class="gbox" id="gform">
     <h1>리마켓 입찰 레이더</h1>
@@ -802,6 +802,7 @@ async function boot(pw){
 function tryBoot(pw,remember){
   $('gbtn').disabled=true;$('gerr').textContent='';
   return boot(pw).then(()=>{
+    SPW=pw;
     try{sessionStorage.setItem('rm-pw',pw);if(remember)localStorage.setItem('rm-pw',pw);}catch(e){}
     if(locked){$('logout').hidden=false;$('stats').hidden=false;}
   }).catch(e=>{
@@ -811,7 +812,37 @@ function tryBoot(pw,remember){
   }).finally(()=>{$('gbtn').disabled=false;});
 }
 $('gform').addEventListener('submit',e=>{e.preventDefault();const pw=$('gpw').value;if(pw)tryBoot(pw,$('grm').checked);});
-$('stats').addEventListener('click',()=>{$('statf').src='https://remarket-bids.goatcounter.com/';$('statov').style.display='block';});$('statx').addEventListener('click',()=>{$('statov').style.display='none';});
+let SPW='';
+function kst(iso){return new Date(new Date(iso).getTime()+9*3600e3);}
+async function showStats(){
+  $('statov').style.display='block';const B=$('statbody');B.textContent='불러오는 중…';
+  try{
+    const d=await readData('stats',SPW,true);
+    if(!d||!d.days){B.textContent='아직 통계가 없습니다. 매 시간 정각 10분쯤 갱신됩니다.';return;}
+    // GoatCounter 시간은 UTC 기준 → 한국시간(+9)으로 옮겨 날짜·시간별로 합칩니다.
+    const map={};
+    d.days.forEach(x=>{(x.hourly||[]).forEach((n,h)=>{if(!n)return;
+      const t=new Date(Date.parse(x.day+'T00:00:00Z')+h*3600e3+9*3600e3);
+      const k=t.toISOString().slice(0,10);(map[k]=map[k]||new Array(24).fill(0))[t.getUTCHours()]+=n;});});
+    const keys=Object.keys(map).sort().reverse();
+    if(!keys.length){B.textContent='아직 방문 기록이 없습니다.';return;}
+    const dn=['일','월','화','수','목','금','토'];
+    let h='<div style="color:#666;margin-bottom:8px">한국시간 기준 · 시간대별 방문 수 · 마지막 갱신 '+kst(d.updated).toISOString().slice(5,16).replace('T',' ')+'</div>';
+    keys.slice(0,7).forEach(k=>{
+      const a=map[k],tot=a.reduce((x,y)=>x+y,0),mx=Math.max(...a,1);
+      const day=dn[new Date(k+'T00:00:00Z').getUTCDay()];
+      h+='<div style="margin:14px 0 4px"><b>'+k.slice(5)+' ('+day+')</b> · 하루 '+tot+'회</div><div style="display:flex;align-items:flex-end;gap:2px;height:64px">';
+      a.forEach((n,i)=>{h+='<div title="'+i+'시 '+n+'회" style="flex:1;background:'+(n?'#2f6fed':'#e6e9ef')+';height:'+(n?Math.max(6,n/mx*100):4)+'%;border-radius:2px 2px 0 0"></div>';});
+      h+='</div><div style="display:flex;gap:2px;font-size:10px;color:#888">';
+      a.forEach((n,i)=>{h+='<div style="flex:1;text-align:center">'+(i%3==0?i:'')+'</div>';});
+      h+='</div>';
+      const top=a.map((n,i)=>[n,i]).filter(x=>x[0]).sort((x,y)=>y[0]-x[0]).slice(0,3).map(x=>x[1]+'시 '+x[0]+'회').join(', ');
+      if(top)h+='<div style="font-size:12px;color:#555;margin-top:2px">많았던 시간: '+top+'</div>';
+    });
+    B.innerHTML=h;
+  }catch(e){B.textContent='통계를 불러오지 못했습니다.';}
+}
+$('stats').addEventListener('click',showStats);$('statx').addEventListener('click',()=>{$('statov').style.display='none';});
 $('logout').addEventListener('click',()=>{try{sessionStorage.removeItem('rm-pw');localStorage.removeItem('rm-pw');}catch(e){}location.reload();});
 (async()=>{
   let saved='';try{saved=sessionStorage.getItem('rm-pw')||localStorage.getItem('rm-pw')||'';}catch(e){}
