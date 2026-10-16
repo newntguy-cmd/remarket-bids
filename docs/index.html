@@ -838,7 +838,7 @@ async function showStats(){
     const keys=Object.keys(map).sort().reverse();
     if(!keys.length){B.textContent='아직 방문 기록이 없습니다.';return;}
     const dn=['일','월','화','수','목','금','토'];
-    let h='<div style="color:#666;margin-bottom:8px">한국시간 기준 · 시간대별 방문 수 · 마지막 갱신 '+kst(d.updated).toISOString().slice(5,16).replace('T',' ')+'</div>';
+    let h='<div style="color:#666;margin-bottom:8px">한국시간 기준 · 시간대별 방문 수 · '+(live?'방금 조회':'마지막 갱신')+' '+kst(d.updated).toISOString().slice(5,16).replace('T',' ')+'</div>';
     keys.slice(0,7).forEach(k=>{
       const a=map[k],tot=a.reduce((x,y)=>x+y,0),mx=Math.max(...a,1);
       const day=dn[new Date(k+'T00:00:00Z').getUTCDay()];
