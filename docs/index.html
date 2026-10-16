@@ -823,10 +823,10 @@ async function showStats(){
   try{
     const d=await readData('stats',SPW,true);
     if(!d||!d.days){B.textContent='아직 통계가 없습니다. 매 시간 정각 10분쯤 갱신됩니다.';return;}
-    // GoatCounter 시간은 UTC 기준 → 한국시간(+9)으로 옮겨 날짜·시간별로 합칩니다.
+    // GoatCounter 값은 이미 한국시간 기준이라 그대로 날짜·시간별로 모읍니다.
     const map={};
     d.days.forEach(x=>{(x.hourly||[]).forEach((n,h)=>{if(!n)return;
-      const t=new Date(Date.parse(x.day+'T00:00:00Z')+h*3600e3+9*3600e3);
+      const t=new Date(Date.parse(x.day+'T00:00:00Z')+h*3600e3);
       const k=t.toISOString().slice(0,10);(map[k]=map[k]||new Array(24).fill(0))[t.getUTCHours()]+=n;});});
     const keys=Object.keys(map).sort().reverse();
     if(!keys.length){B.textContent='아직 방문 기록이 없습니다.';return;}
