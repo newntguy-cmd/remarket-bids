@@ -823,6 +823,13 @@ async function showStats(){
   try{
     const d=await readData('stats',SPW,true);
     if(!d||!d.days){B.textContent='아직 통계가 없습니다. 매 시간 정각 10분쯤 갱신됩니다.';return;}
+    // 열 때마다 통계 사이트에서 바로 최신 숫자를 받아옵니다(실패하면 매시간 저장된 값을 씁니다).
+    let live=false;
+    if(d.tk){try{
+      const e=new Date(),b=new Date(e.getTime()-30*864e5),f=x=>x.toISOString().slice(0,19)+'Z';
+      const r=await fetch('https://remarket-bids.goatcounter.com/api/v0/stats/total?start='+f(b)+'&end='+f(e),{headers:{Authorization:'Bearer '+d.tk}});
+      if(r.ok){const j=await r.json();if(j&&j.stats){d.days=j.stats.map(x=>({day:x.day,hourly:x.hourly||[]}));d.updated=e.toISOString();live=true;}}
+    }catch(x){}}
     // GoatCounter 값은 이미 한국시간 기준이라 그대로 날짜·시간별로 모읍니다.
     const map={};
     d.days.forEach(x=>{(x.hourly||[]).forEach((n,h)=>{if(!n)return;
