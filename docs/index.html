@@ -620,6 +620,10 @@ const G={q:'',regions:new Set(),cats:new Set(),days:7,min:0,con:'all',sort:'date
 let A=[],aopen=new Set(),apage=1,apsize=30,view=store.get('bid-view','awards');
 const noOf=id=>(id||'').split('-')[0];
 const kstDay=n=>new Date(Date.now()+9*HOUR-n*DAY).toISOString().slice(0,10);
+function g2bUrl(id){
+  const i=String(id).lastIndexOf('-');const no=i>0?id.slice(0,i):id,ord=i>0?id.slice(i+1):'0';
+  return 'https://www.g2b.go.kr/link/PNPE027_01/single/?bidPbancNo='+encodeURIComponent(no)+'&bidPbancOrd='+encodeURIComponent(String(ord).padStart(3,'0'));
+}
 function buildA(){
   const idx={};rows.forEach(r=>{idx[r.id]=r;});
   A=Object.entries(AW.win).map(([id,w])=>{
@@ -628,7 +632,7 @@ function buildA(){
     const region=r?r.region:(overrides[id]||detect({site:'',demand:org,org:org,title:title}));
     const cat=r?r.cat:catOf({kind:'',title:title});
     const same=!!(con&&con.corps.some(x=>x.biz&&x.biz===w.b));
-    return {id,w,r,con,title,org,region,cat,same,amt:Number(w.amt)||0,date:w.d||'',url:r?safeUrl(r.url):''};
+    return {id,w,r,con,title,org,region,cat,same,amt:Number(w.amt)||0,date:w.d||'',url:(r&&safeUrl(r.url))||g2bUrl(id)};
   });
 }
 function aPass(a,skip){
@@ -681,7 +685,7 @@ function aRow(a){
   const am=el('div','aamt');am.append('낙찰금액 ',el('b',null,a.amt?won(a.amt):'-'));
   const ex=[a.w.rate?Number(a.w.rate).toFixed(2)+'%':'',a.w.np?'참여 '+a.w.np+'개사':''].filter(Boolean).join(' · ');
   if(ex)am.append('  '+ex);c1.append(am);
-  if(a.url){const l=el('div','acts');const x=el('a',null,'나라장터 공고');x.href=a.url;x.target='_blank';x.rel='noopener';l.append(x);c1.append(l);}
+  if(a.url){const l=el('div','acts');const x=el('a','pri','나라장터 공고 원문 ↗');x.href=a.url;x.target='_blank';x.rel='noopener';l.append(x);c1.append(l);}
   // 낙찰업체
   const c2=el('div','ac');c2.append(el('div','lab','낙찰업체 (1순위)'));
   c2.append(compBlock('win',{name:a.w.n,ceo:a.w.c,biz:a.w.b,tel:a.w.t,addr:a.w.a}));
