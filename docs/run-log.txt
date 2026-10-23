@@ -1,23 +1,8 @@
-  1쪽 시도 1/3 실패: <urlopen error timed out>
-  1쪽 시도 2/3 실패: <urlopen error timed out>
-  1쪽 시도 3/3 실패: <urlopen error timed out>
-키 방식 시도 실패: <urlopen error timed out>
-주의: 모든 키 방식이 실패했습니다(이번에는 새 공고 없이 진행): <urlopen error timed out>
-조회 기간 202610170000 ~ 202610220917
-  구간 10-17 ~ 10-22
-받은 공고 0건
-저장 완료: 누적 20324건
-조회 기간 낙찰 202610170000 ~ 202610220920 / 계약 202610170000 ~ 202610220920
-  1쪽 시도 1/3 실패: <urlopen error timed out>
-  1쪽 시도 2/3 실패: <urlopen error timed out>
-  1쪽 시도 3/3 실패: <urlopen error timed out>
-조회 실패(getScsbidListSttusCnstwk): <urlopen error timed out>
-  1쪽 시도 1/3 실패: <urlopen error timed out>
-  1쪽 시도 2/3 실패: <urlopen error timed out>
-  1쪽 시도 3/3 실패: <urlopen error timed out>
-조회 실패(getCntrctInfoListCnstwk): <urlopen error timed out>
-  1쪽 시도 1/3 실패: <urlopen error timed out>
-  1쪽 시도 2/3 실패: <urlopen error timed out>
-  1쪽 시도 3/3 실패: <urlopen error timed out>
-조회 실패(getCntrctInfoListCnstwk): <urlopen error timed out>
-낙찰·계약 모두 받지 못해 기존 파일을 그대로 둡니다.
+  4쪽 시도 1/5 실패: <urlopen error _ssl.c:993: The handshake operation timed out>
+  21쪽 시도 1/5 실패: <urlopen error _ssl.c:993: The handshake operation timed out>
+  23쪽 시도 1/5 실패: <urlopen error _ssl.c:993: The handshake operation timed out>
+조회 기간 202610180000 ~ 202610230913
+  구간 10-18 ~ 10-23
+전체 2511건, 1쪽 100건
+받은 공고 2511건
+저장 완료: 누적 21622건
