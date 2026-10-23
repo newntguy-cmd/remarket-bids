@@ -489,7 +489,7 @@ function resultBox(r,now){
   if(!r.win&&!r.con){
     const n=el('div','note');
     if(!opened)n.textContent='아직 개찰 전입니다. 개찰 '+(r.open?r.open.slice(0,16)+' 예정':'일정 미정')+' · 낙찰업체는 개찰 후 1~3일 안에 나라장터에 등록되면 자동으로 이곳에 나타납니다.';
-    else n.textContent='개찰은 끝났고 낙찰 결과가 나라장터에 등록되기를 기다리는 중입니다(보통 1~3일). 등록되면 하루 두 번(09:30, 15:30) 자동으로 채워집니다.';
+    else n.textContent='개찰은 끝났고 낙찰 결과가 나라장터에 등록되기를 기다리는 중입니다(보통 1~3일). 등록되면 다음 날 아침 자동 수집 때 채워집니다.';
     wrap.append(n);return wrap;
   }
   const box=el('div','res');
