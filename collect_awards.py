@@ -19,6 +19,8 @@ import rmcrypt
 H = "https://apis.data.go.kr/1230000"
 WIN_URL = f"{H}/as/ScsbidInfoService/getScsbidListSttusCnstwk"
 CON_URL = f"{H}/ao/CntrctInfoService/getCntrctInfoListCnstwk"
+OPE_URL = f"{H}/as/ScsbidInfoService/getOpengResultListInfoCnstwk"  # 개찰결과(1순위 업체) — 낙찰자 확정 전에도 나옵니다
+OPE_DAYS = 14
 KST = dt.timezone(dt.timedelta(hours=9))
 OUT = os.path.join("docs", "awards.json")
 KEEP_DAYS = 60
@@ -194,11 +196,11 @@ def parse_corps(s):
 
 def main():
     now = dt.datetime.now(KST)
-    old = {"win": {}, "con": {}}
+    old = {"win": {}, "con": {}, "ope": {}}
     loaded = rmcrypt.load("awards")
     if loaded:
         old = loaded
-        old.setdefault("win", {}); old.setdefault("con", {})
+        old.setdefault("win", {}); old.setdefault("con", {}); old.setdefault("ope", {})
     env_days = os.environ.get("DAYS", "").strip()
     end = now.strftime("%Y%m%d%H%M")
     old_ok = old.get("ok") or {}
@@ -233,6 +235,22 @@ def main():
         k = f"{no}-{od}"
         if k not in win or rec["rb"] >= win[k].get("rb", "000"):
             win[k] = rec
+    # 개찰결과: 최근 OPE_DAYS일 개찰 건의 1순위 업체(낙찰자 확정 전 '낙찰 예정' 표시용)
+    ope = old["ope"]
+    ob = (now - dt.timedelta(days=OPE_DAYS)).strftime("%Y%m%d0000")
+    os_, _ = fetch_range(OPE_URL, ob, end, step=2)
+    for it in os_ or []:
+        no, od = it.get("bidNtceNo"), it.get("bidNtceOrd")
+        p_ = (it.get("opengCorpInfo") or "").split("^")
+        if not no or len(p_) < 5 or not p_[0] or "개찰완료" not in (it.get("progrsDivCdNm") or ""):
+            continue
+        k = f"{no}-{od}"
+        rb = it.get("rbidNo") or "000"
+        if k in ope and rb < ope[k].get("rb", "000"):
+            continue
+        ope[k] = {"n": p_[0], "b": re.sub(r"\D", "", p_[1]), "c": p_[2], "amt": p_[3], "rate": p_[4],
+                  "np": it.get("prtcptCnum") or "", "d": (it.get("opengDt") or "")[:10], "nm": it.get("bidNtceNm") or "",
+                  "dm": it.get("dminsttNm") or "", "rb": rb, "reg": it.get("inptDt") or ""}
     cs, c_cov = fetch_range(CON_URL, cb, end, step=4)  # 계약은 하루 3천건 이상이라 4일씩 나눠야 쪽수 한도(200쪽)에 안 걸립니다
     for it in cs or []:
         no = it.get("ntceNo")
@@ -252,6 +270,8 @@ def main():
         sys.exit("낙찰·계약 모두 받지 못해 기존 파일을 그대로 둡니다.")
 
     cutoff = (now - dt.timedelta(days=KEEP_DAYS)).strftime("%Y-%m-%d")
+    ope_cut = (now - dt.timedelta(days=OPE_DAYS + 7)).strftime("%Y-%m-%d")
+    ope = {k: v for k, v in ope.items() if k not in win and (v.get("d") or "9999") >= ope_cut}
     # 계약 목록은 공사 전체라 양이 많으므로, 낙찰 결과와 연결되는 것만 보관합니다.
     won_nos = {k.split("-")[0] for k in win}
     con = {k: v for k, v in con.items() if k in won_nos}
@@ -261,8 +281,8 @@ def main():
         "win": new_mark(old_ok.get("win"), w_cov, dt.datetime.strptime(wb, "%Y%m%d%H%M"), now),
         "con": new_mark(old_ok.get("con"), c_cov, dt.datetime.strptime(cb, "%Y%m%d%H%M"), now),
     }
-    rmcrypt.save("awards", {"updated": now.isoformat(timespec="minutes"), "win": win, "con": con, "ok": ok})
-    print(f"저장 완료: 낙찰 {len(win)}건, 계약 {len(con)}건", flush=True)
+    rmcrypt.save("awards", {"updated": now.isoformat(timespec="minutes"), "win": win, "con": con, "ope": ope, "ok": ok})
+    print(f"저장 완료: 낙찰 {len(win)}건, 계약 {len(con)}건, 개찰 1순위(낙찰 예정) {len(ope)}건", flush=True)
     for kind, label in (("win", "낙찰"), ("con", "계약")):
         if ok[kind] != now.isoformat(timespec="minutes"):
             print(f"⚠ {label} 정보를 끝까지 받지 못했습니다. 다음 실행 때 빠진 기간부터 이어서 받습니다 (마지막으로 빠짐없이 받은 시점: {ok[kind] or '기록 없음'})", flush=True)

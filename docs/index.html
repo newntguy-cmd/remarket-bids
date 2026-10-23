@@ -229,7 +229,7 @@ body.locked .top,body.locked .view{display:none}
       </select>
       <span class="lbl" style="margin-left:10px">계약</span>
       <select id="a-con" aria-label="계약 여부">
-        <option value="all">전체</option><option value="done">계약 완료</option><option value="wait">계약 대기</option><option value="diff">낙찰업체와 다른 업체가 계약</option>
+        <option value="all">전체</option><option value="done">계약 완료</option><option value="wait">계약 대기</option><option value="pend">낙찰 예정(개찰 1순위)</option><option value="diff">낙찰업체와 다른 업체가 계약</option>
       </select>
       <span class="lbl" style="margin-left:10px">정렬</span>
       <select id="a-sort" aria-label="정렬"><option value="date">낙찰일 최신순</option><option value="amt">낙찰금액 큰 순</option></select>
@@ -634,6 +634,15 @@ function buildA(){
     const same=!!(con&&con.corps.some(x=>x.biz&&x.biz===w.b));
     return {id,w,r,con,title,org,region,cat,same,amt:Number(w.amt)||0,date:w.d||'',url:(r&&safeUrl(r.url))||g2bUrl(id)};
   });
+  // 개찰은 끝났지만 낙찰자가 아직 확정되지 않은 건: 개찰 1순위 업체를 '낙찰 예정'으로 보여 줍니다.
+  Object.entries(AW.ope||{}).forEach(([id,w0])=>{
+    if(AW.win[id])return;
+    const r=idx[id]||null,w=Object.assign({a:'',t:''},w0);
+    const title=(w.nm||(r&&r.title)||'').trim(),org=w.dm||(r&&(r.demand||r.org))||'';
+    A.push({id,w,r,con:null,title,org,pend:true,
+      region:r?r.region:(overrides[id]||detect({site:'',demand:org,org:org,title:title})),
+      cat:r?r.cat:catOf({kind:'',title:title}),same:false,amt:Number(w.amt)||0,date:w.d||'',url:(r&&safeUrl(r.url))||g2bUrl(id)});
+  });
 }
 function aPass(a,skip){
   if(G.days>=0&&!(a.date>=kstDay(G.days)))return false;
@@ -641,7 +650,8 @@ function aPass(a,skip){
   if(skip!=='cat'&&G.cats.size&&!G.cats.has(a.cat))return false;
   if(G.min&&a.amt<G.min)return false;
   if(G.con==='done'&&!a.con)return false;
-  if(G.con==='wait'&&a.con)return false;
+  if(G.con==='wait'&&(a.con||a.pend))return false;
+  if(G.con==='pend'&&!a.pend)return false;
   if(G.con==='diff'&&!(a.con&&!a.same))return false;
   if(G.q){
     const t=[a.w.n,a.title,a.org,a.w.c,a.w.a,a.w.b,a.con?a.con.corps.map(x=>x.name+' '+x.biz).join(' '):''].join(' ').toLowerCase();
@@ -672,7 +682,7 @@ function compBlock(kind,c){
 function aRow(a){
   const item=el('div','item'+(aopen.has(a.id)?' open':''));
   const hd=el('div','ihd');hd.tabIndex=0;hd.setAttribute('role','button');hd.setAttribute('aria-expanded',String(aopen.has(a.id)));
-  hd.append(el('span','dt',(a.date||'').slice(5)),el('span','tt',a.title||'(공고명 없음)'),el('span','chev','▼'));
+  hd.append(el('span','dt',(a.date||'').slice(5)),el('span','tt',a.title||'(공고명 없음)'),...(a.pend?[el('span','tag diff','낙찰 예정')]:[]),el('span','chev','▼'));
   const tgl=()=>{if(String(window.getSelection&&window.getSelection()).length>0)return;if(aopen.has(a.id))aopen.delete(a.id);else aopen.add(a.id);renderA();};
   hd.addEventListener('click',tgl);hd.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tgl();}});
   item.append(hd);
@@ -680,15 +690,16 @@ function aRow(a){
   const body=el('div','ibody');const row=el('div','arow');
   // 공고
   const c1=el('div','ac');c1.append(el('div','lab','공고'));
-  const top=el('div');top.style.marginBottom='6px';top.append(el('span','dchip','낙찰 '+(a.date||'')));c1.append(top);
+  const top=el('div');top.style.marginBottom='6px';top.append(el('span','dchip',(a.pend?'개찰 ':'낙찰 ')+(a.date||'')));c1.append(top);
   const mt=el('div','ameta');mt.append(el('span','region',a.region),el('span','cat',a.cat),a.org);c1.append(mt);
-  const am=el('div','aamt');am.append('낙찰금액 ',el('b',null,a.amt?won(a.amt):'-'));
+  const am=el('div','aamt');am.append(a.pend?'1순위 투찰금액 ':'낙찰금액 ',el('b',null,a.amt?won(a.amt):'-'));
   const ex=[a.w.rate?Number(a.w.rate).toFixed(2)+'%':'',a.w.np?'참여 '+a.w.np+'개사':''].filter(Boolean).join(' · ');
   if(ex)am.append('  '+ex);c1.append(am);
   if(a.url){const l=el('div','acts');const x=el('a','pri','나라장터 공고 원문 ↗');x.href=a.url;x.target='_blank';x.rel='noopener';l.append(x);c1.append(l);}
   // 낙찰업체
-  const c2=el('div','ac');c2.append(el('div','lab','낙찰업체 (1순위)'));
+  const c2=el('div','ac');c2.append(el('div','lab',a.pend?'개찰 1순위 (낙찰 예정)':'낙찰업체 (1순위)'));
   c2.append(compBlock('win',{name:a.w.n,ceo:a.w.c,biz:a.w.b,tel:a.w.t,addr:a.w.a}));
+  if(a.pend)c2.append(el('div','cs','※ 투찰금액 1순위입니다. 적격심사 등을 통과해 낙찰자가 확정되면 주소·전화가 채워집니다. 지금은 비즈노에서 확인하세요.'));
   // 계약업체
   const c3=el('div','ac');c3.append(el('div','lab','계약업체'));
   if(a.con){
@@ -700,7 +711,8 @@ function aRow(a){
     bx.prepend(tg);
     if(!a.same)bx.append(el('div','cs','낙찰업체의 서류 미비 등으로 다른 업체가 계약했을 수 있습니다. 연락처는 비즈노에서 확인하세요.'));
     c3.append(bx);
-  }else c3.append(el('div','box empty','계약 대기 중입니다. 낙찰 후 1~3주 뒤에 등록되면 자동으로 표시됩니다.'));
+  }else if(a.pend)c3.append(el('div','box empty','낙찰자 확정 전입니다. 확정되면 낙찰·계약 정보가 이어서 표시됩니다.'));
+  else c3.append(el('div','box empty','계약 대기 중입니다. 낙찰 후 1~3주 뒤에 등록되면 자동으로 표시됩니다.'));
   row.append(c1,c2,c3);body.append(row);item.append(body);return item;
 }
 function renderA(){
@@ -722,13 +734,14 @@ function renderA(){
   list.sort(G.sort==='amt'?(x,y)=>y.amt-x.amt:(x,y)=>(y.date.localeCompare(x.date))||(y.amt-x.amt));
   renderA.last=list;
   // KPI
-  const sum=list.reduce((t,a)=>t+a.amt,0),done=list.filter(a=>a.con).length,diff=list.filter(a=>a.con&&!a.same).length;
-  const biz=new Set(list.map(a=>a.w.b).filter(Boolean)).size;
+  const pn=list.filter(a=>a.pend).length,fl=list.filter(a=>!a.pend);
+  const sum=fl.reduce((t,a)=>t+a.amt,0),done=fl.filter(a=>a.con).length,diff=fl.filter(a=>a.con&&!a.same).length;
+  const biz=new Set(fl.map(a=>a.w.b).filter(Boolean)).size;
   const k=$('a-kpis');k.textContent='';
-  [['낙찰 공고',list.length.toLocaleString('ko-KR'),'건'],['낙찰금액 합계',won(sum),'원'],['계약 완료',done.toLocaleString('ko-KR'),'건'+(list.length?' ('+Math.round(done/list.length*100)+'%)':'')+(diff?' · 다른 업체 '+diff:'')],['낙찰업체 수',biz.toLocaleString('ko-KR'),'곳']].forEach(([t,v,u])=>{
+  [['낙찰 공고',fl.length.toLocaleString('ko-KR'),'건'+(pn?' (+낙찰 예정 '+pn+')':'')],['낙찰금액 합계',won(sum),'원'],['계약 완료',done.toLocaleString('ko-KR'),'건'+(fl.length?' ('+Math.round(done/fl.length*100)+'%)':'')+(diff?' · 다른 업체 '+diff:'')],['낙찰업체 수',biz.toLocaleString('ko-KR'),'곳']].forEach(([t,v,u])=>{
     const d=el('div','kpi');d.append(el('div','k',t));const vv=el('div','v',v);vv.append(el('small',null,u));d.append(vv);k.append(d);
   });
-  $('a-total').replaceChildren('조건에 맞는 낙찰 ',el('b',null,list.length.toLocaleString('ko-KR')),' 건');
+  $('a-total').replaceChildren('조건에 맞는 낙찰 ',el('b',null,fl.length.toLocaleString('ko-KR')),' 건'+(pn?' · 낙찰 예정 '+pn+'건':''));
   const pages=Math.max(1,Math.ceil(list.length/apsize));if(apage>pages)apage=pages;
   const box=$('a-list');box.textContent='';
   if(!list.length){box.append(el('div','card empty',loaded?'조건에 맞는 낙찰 결과가 없습니다. 기간을 늘려 보세요.':'불러오는 중입니다.'));}
