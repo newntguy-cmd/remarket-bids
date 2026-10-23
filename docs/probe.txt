@@ -1,0 +1,244 @@
+== getOpengResultListInfoCnstwk {'inqryDiv': 2, 'bidNtceNo': 'R26BK01774112'}
+{"nkoneps.com.response.ResponseError": {
+  "header": {
+    "resultCode": "08",
+    "resultMsg": "필수값 입력 에러"
+  }
+}}
+
+== getOpengResultListInfoCnstwk {'inqryDiv': 1, 'inqryBgnDt': '202610221200', 'inqryEndDt': '202610221400'}
+{"response": {
+  "header": {
+    "resultCode": "00",
+    "resultMsg": "정상"
+  },
+  "body": {
+    "items": [
+      {
+        "bidNtceNo": "R26BK01774583",
+        "bidNtceOrd": "000",
+        "bidClsfcNo": "0",
+        "rbidNo": "000",
+        "bidNtceNm": "국도13호선 해남 현산 고현지구 교차로 개선공사",
+        "opengDt": "2026-10-22 11:00:00",
+        "prtcptCnum": "731",
+        "opengCorpInfo": "주식회사 보문건설^7828800677^유창훈^2774507610^89.66",
+        "progrsDivCdNm": "개찰완료",
+        "inptDt": "2026-10-22 12:14:51",
+        "rsrvtnPrceFileExistnceYn": "Y",
+        "ntceInsttCd": "1613260",
+        "ntceInsttNm": "국토교통부 익산지방국토관리청 광주국토관리사무소",
+        "dminsttCd": "1613260",
+        "dminsttNm": "국토교통부 익산지방국토관리청 광주국토관리사무소",
+        "opengRsltNtcCntnts": "개찰완료"
+      },
+      {
+        "bidNtceNo": "R26BK01774604",
+        "bidNtceOrd": "000",
+        "bidClsfcNo": "0",
+        "rbidNo": "000",
+        "bidNtceNm": "국도27호선 완도 약산 장용지구 교차로 개선공사",
+        "opengDt": "2026-10-22 11:00:00",
+        "prtcptCnum": "824",
+        "opengCorpInfo": "금강토건 유한회사^4118113913^이양재^770169000^90.362",
+        "progrsDivCdNm": "개찰완료",
+        "inptDt": "2026-10-22 12:17:54",
+        "rsrvtnPrceFileExistnceYn": "Y",
+        "ntceInsttCd": "1613260",
+        "ntceInsttNm": "국토교통부 익산지방국토관리청 광주국토관리사무소",
+        "dminsttCd": "1613260",
+        "dminsttNm": "국토교통부 익산지방국토관리청 광주국토관리사무소",
+        "opengRsltNtcCntnts": "개찰완료"
+      },
+      {
+        "bidNtceNo": "R26BK01774638",
+        "bidNtceOrd": "000",
+        "bidClsfcNo": "0",
+        "rbidNo": "000",
+        "bidNtceNm": "국도13호선 강진 성전 신풍삼거리 교통사고 잦은 곳 개선공사",
+        "opengDt": "2026-10-22 11:00:00",
+        "prtcptCnum": "485",
+        "opengCorpInfo": "광진종합건설주식회사^4098159600^유경희^288282000^90.409",
+        "progrsDivCdNm": "개찰완료",
+        "inptDt": "2026-10-22 12:19:53",
+        "rsrvtnPrceFileExistnceYn": "Y",
+        "ntceInsttCd": "1613260",
+        "ntceInsttNm": "국토교통부 익산지방국토관리청 광주국토관리사무소",
+        "dminsttCd": "1613260",
+        "dminsttNm": "국토교통부 익산지방국토관리청 광주국토관리사무소",
+        "opengRsltNtcCntnts": "개찰완료"
+      },
+      {
+        "bidNtceNo": "R26BK01775911",
+        "bidNtceOrd": "000",
+        "bidClsfcNo": "0",
+        "rbidNo": "000",
+        "bidNtceNm": "2026년 산불예방 숲가꾸기사업(도개1-1지구)",
+        "opengDt": "2026-10-22 11:00:00",
+        "prtcptCnum": "14",
+        "opengCorpInfo": "주식회사 영주임업^6458103492^손길준^110347700^90.416",
+        "progrsDivCdNm": "개찰완료",
+        "inptDt": "2026-10-22 12:22:53",
+        "rsrvtnPrceFileExistnceYn": "Y",
+        
+
+== getOpengResultListInfoCnstwkPreparPcDetail {'inqryDiv': 2, 'bidNtceNo': 'R26BK01774112'}
+{"response": {
+  "header": {
+    "resultCode": "00",
+    "resultMsg": "정상"
+  },
+  "body": {
+    "items": [
+      {
+        "bidNtceNo": "R26BK01774112",
+        "bidNtceOrd": "000",
+        "bidClsfcNo": "0",
+        "rbidNo": "000",
+        "bidNtceNm": "신갈오거리 도시재생 공유플랫폼 건립사업 건축공사",
+        "plnprc": "8854235275",
+        "bssamt": "8946948000",
+        "totRsrvtnPrceNum": "15",
+        "compnoRsrvtnPrceSno": "1",
+        "bsisPlnprc": "9004476900",
+        "drwtYn": "N",
+        "drwtNum": "81",
+        "bidwinrSlctnAplBssCntnts": "행자부",
+        "rlOpengDt": "2026-10-22 14:42:34",
+        "bssamtBssUpNum": "7",
+        "compnoRsrvtnPrceMkngDt": "2026-10-22 14:31:03",
+        "inptDt": "2026-10-22 14:42:34",
+        "PrearngPrcePurcnstcst": "7605470841",
+        "bssAmtPurcnstcst": "7685107749"
+      },
+      {
+        "bidNtceNo": "R26BK01774112",
+        "bidNtceOrd": "000",
+        "bidClsfcNo": "0",
+        "rbidNo": "000",
+        "bidNtceNm": "신갈오거리 도시재생 공유플랫폼 건립사업 건축공사",
+        "plnprc": "8854235275",
+        "bssamt": "8946948000",
+        "totRsrvtnPrceNum": "15",
+        "compnoRsrvtnPrceSno": "2",
+        "bsisPlnprc": "8760314700",
+        "drwtYn": "N",
+        "drwtNum": "71",
+        "bidwinrSlctnAplBssCntnts": "행자부",
+        "rlOpengDt": "2026-10-22 14:42:34",
+        "bssamtBssUpNum": "7",
+        "compnoRsrvtnPrceMkngDt": "2026-10-22 14:31:03",
+        "inptDt": "2026-10-22 14:42:34",
+        "PrearngPrcePurcnstcst": "7605470841",
+        "bssAmtPurcnstcst": "7685107749"
+      },
+      {
+        "bidNtceNo": "R26BK01774112",
+        "bidNtceOrd": "000",
+        "bidClsfcNo": "0",
+        "rbidNo": "000",
+        "bidNtceNm": "신갈오거리 도시재생 공유플랫폼 건립사업 건축공사",
+        "plnprc": "8854235275",
+        "bssamt": "8946948000",
+        "totRsrvtnPrceNum": "15",
+        "compnoRsrvtnPrceSno": "3",
+        "bsisPlnprc": "8968510200",
+        "drwtYn": "N",
+        "drwtNum": "85",
+        "bidwinrSlctnAplBssCntnts": "행자부",
+        "rlOpengDt": "2026-10-22 14:42:34",
+        "bssamtBssUpNum": "7",
+        "compnoRsrvtnPrceMkngDt": "2026-10-22 14:31:03",
+        "inptDt": "2026-10-22 14:42:34",
+        "PrearngPrcePurcnstcst": "7605470841",
+        "bssAmtPurcnstcst": "7685107749"
+      },
+      {
+        "bidNtceNo": "R26BK01774112",
+        "bidNtceOrd": "000",
+        "bidClsfcNo": "0",
+        "rbidNo": "000",
+        "bidNtceNm": "신갈오거리 도시재생 공유플랫폼 건립사업 건축공사",
+        "plnprc": "8854235275",
+        "bssamt": "8946948000",
+        "totRsrvtnPrceNu
+
+== getOpengResultListInfoCnstwkPreparPcDetail {'inqryDiv': 1, 'inqryBgnDt': '202610221200', 'inqryEndDt': '202610221400'}
+{"response": {
+  "header": {
+    "resultCode": "00",
+    "resultMsg": "정상"
+  },
+  "body": {
+    "items": [
+      {
+        "bidNtceNo": "R26BK01715633",
+        "bidNtceOrd": "000",
+        "bidClsfcNo": "0",
+        "rbidNo": "000",
+        "bidNtceNm": "2026년 일반국토 비탈면 IoT 계측시스템 보수(교체) 공사",
+        "plnprc": "4456412450",
+        "bssamt": "4470203000",
+        "totRsrvtnPrceNum": "15",
+        "compnoRsrvtnPrceSno": "1",
+        "bsisPlnprc": "4445035800",
+        "drwtYn": "N",
+        "drwtNum": "314",
+        "bidwinrSlctnAplBssCntnts": "조달청",
+        "rlOpengDt": "2026-10-22 13:13:56",
+        "bssamtBssUpNum": "8",
+        "compnoRsrvtnPrceMkngDt": "2026-10-22 11:07:29",
+        "inptDt": "2026-10-22 13:13:56",
+        "PrearngPrcePurcnstcst": "3928822544",
+        "bssAmtPurcnstcst": "3940980445"
+      },
+      {
+        "bidNtceNo": "R26BK01715633",
+        "bidNtceOrd": "000",
+        "bidClsfcNo": "0",
+        "rbidNo": "000",
+        "bidNtceNm": "2026년 일반국토 비탈면 IoT 계측시스템 보수(교체) 공사",
+        "plnprc": "4456412450",
+        "bssamt": "4470203000",
+        "totRsrvtnPrceNum": "15",
+        "compnoRsrvtnPrceSno": "2",
+        "bsisPlnprc": "4551560700",
+        "drwtYn": "N",
+        "drwtNum": "339",
+        "bidwinrSlctnAplBssCntnts": "조달청",
+        "rlOpengDt": "2026-10-22 13:13:56",
+        "bssamtBssUpNum": "8",
+        "compnoRsrvtnPrceMkngDt": "2026-10-22 11:07:29",
+        "inptDt": "2026-10-22 13:13:56",
+        "PrearngPrcePurcnstcst": "3928822544",
+        "bssAmtPurcnstcst": "3940980445"
+      },
+      {
+        "bidNtceNo": "R26BK01715633",
+        "bidNtceOrd": "000",
+        "bidClsfcNo": "0",
+        "rbidNo": "000",
+        "bidNtceNm": "2026년 일반국토 비탈면 IoT 계측시스템 보수(교체) 공사",
+        "plnprc": "4456412450",
+        "bssamt": "4470203000",
+        "totRsrvtnPrceNum": "15",
+        "compnoRsrvtnPrceSno": "3",
+        "bsisPlnprc": "4529656700",
+        "drwtYn": "N",
+        "drwtNum": "343",
+        "bidwinrSlctnAplBssCntnts": "조달청",
+        "rlOpengDt": "2026-10-22 13:13:56",
+        "bssamtBssUpNum": "8",
+        "compnoRsrvtnPrceMkngDt": "2026-10-22 11:07:29",
+        "inptDt": "2026-10-22 13:13:56",
+        "PrearngPrcePurcnstcst": "3928822544",
+        "bssAmtPurcnstcst": "3940980445"
+      },
+      {
+        "bidNtceNo": "R26BK01715633",
+        "bidNtceOrd": "000",
+        "bidClsfcNo": "0",
+        "rbidNo": "000",
+        "bidNtceNm": "2026년 일반국토 비탈면 IoT 계측시스템 보수(교체) 공사",
+        "plnprc": "4456412450",
+        "bssamt": "44
