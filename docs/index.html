@@ -620,6 +620,7 @@ const G={q:'',regions:new Set(),cats:new Set(),days:7,min:0,con:'all',sort:'date
 let A=[],aopen=new Set(),apage=1,apsize=30,view=store.get('bid-view','awards');
 const noOf=id=>(id||'').split('-')[0];
 const kstDay=n=>new Date(Date.now()+9*HOUR-n*DAY).toISOString().slice(0,10);
+let BIZ={};
 function g2bUrl(id){
   const i=String(id).lastIndexOf('-');const no=i>0?id.slice(0,i):id,ord=i>0?id.slice(i+1):'0';
   return 'https://www.g2b.go.kr/link/PNPE027_01/single/?bidPbancNo='+encodeURIComponent(no)+'&bidPbancOrd='+encodeURIComponent(String(ord).padStart(3,'0'));
@@ -634,10 +635,12 @@ function buildA(){
     const same=!!(con&&con.corps.some(x=>x.biz&&x.biz===w.b));
     return {id,w,r,con,title,org,region,cat,same,amt:Number(w.amt)||0,date:w.d||'',url:(r&&safeUrl(r.url))||g2bUrl(id)};
   });
+  // 최근 낙찰 기록에서 사업자번호별 주소·전화를 모아 둡니다(낙찰 예정 업체가 이미 낙찰받은 적이 있으면 채워 줍니다).
+  BIZ={};Object.values(AW.win).forEach(w=>{if(w.b&&(w.t||w.a)&&(!BIZ[w.b]||(w.d||'')>(BIZ[w.b].d||'')))BIZ[w.b]={t:w.t||'',a:w.a||'',d:w.d||''};});
   // 개찰은 끝났지만 낙찰자가 아직 확정되지 않은 건: 개찰 1순위 업체를 '낙찰 예정'으로 보여 줍니다.
   Object.entries(AW.ope||{}).forEach(([id,w0])=>{
     if(AW.win[id])return;
-    const r=idx[id]||null,w=Object.assign({a:'',t:''},w0);
+    const r=idx[id]||null,k0=BIZ[w0.b]||{},w=Object.assign({a:k0.a||'',t:k0.t||'',fromPast:!!(k0.a||k0.t)},w0);
     const title=(w.nm||(r&&r.title)||'').trim(),org=w.dm||(r&&(r.demand||r.org))||'';
     A.push({id,w,r,con:null,title,org,pend:true,
       region:r?r.region:(overrides[id]||detect({site:'',demand:org,org:org,title:title})),
@@ -699,13 +702,13 @@ function aRow(a){
   // 낙찰업체
   const c2=el('div','ac');c2.append(el('div','lab',a.pend?'개찰 1순위 (낙찰 예정)':'낙찰업체 (1순위)'));
   c2.append(compBlock('win',{name:a.w.n,ceo:a.w.c,biz:a.w.b,tel:a.w.t,addr:a.w.a}));
-  if(a.pend)c2.append(el('div','cs','※ 투찰금액 1순위입니다. 적격심사 등을 통과해 낙찰자가 확정되면 주소·전화가 채워집니다. 지금은 비즈노에서 확인하세요.'));
+  if(a.pend)c2.append(el('div','cs','※ 투찰금액 1순위입니다. '+(a.w.fromPast?'주소·전화는 이 업체의 최근 낙찰 기록에서 가져왔습니다.':'낙찰자가 확정되면 주소·전화가 채워집니다. 지금은 비즈노에서 확인하세요.')+''));
   // 계약업체
   const c3=el('div','ac');c3.append(el('div','lab','계약업체'));
   if(a.con){
     const m=a.con.corps.find(x=>/주계약/.test(x.role))||a.con.corps[0];
     const useW=a.same&&m.biz===a.w.b;
-    const bx=compBlock('con'+(a.same?'':' diff'),{name:a.con.corps.map(x=>x.name).join(', '),ceo:a.con.corps.map(x=>x.ceo).filter(Boolean).join(', '),biz:m.biz,tel:useW?a.w.t:'',addr:useW?a.w.a:''});
+    const bx=compBlock('con'+(a.same?'':' diff'),{name:a.con.corps.map(x=>x.name).join(', '),ceo:a.con.corps.map(x=>x.ceo).filter(Boolean).join(', '),biz:m.biz,tel:useW?a.w.t:((BIZ[m.biz]||{}).t||''),addr:useW?a.w.a:((BIZ[m.biz]||{}).a||'')});
     const tg=el('div','ameta');tg.style.marginBottom='6px';
     tg.append(el('span','tag '+(a.same?'same':'diff'),a.same?'낙찰업체와 동일':'낙찰업체와 다른 업체'),'계약일 '+(a.con.date||'-')+(a.con.amt?' · '+won(a.con.amt):''));
     bx.prepend(tg);
