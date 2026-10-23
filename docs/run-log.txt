@@ -6,3 +6,9 @@
 전체 2511건, 1쪽 100건
 받은 공고 2511건
 저장 완료: 누적 21622건
+조회 기간 낙찰 202610180000 ~ 202610230919 / 계약 202610180000 ~ 202610230919
+  1쪽 시도 1/3 실패: <urlopen error _ssl.c:993: The handshake operation timed out>
+getScsbidListSttusCnstwk: 전체 1777건
+getCntrctInfoListCnstwk: 전체 25189건
+getCntrctInfoListCnstwk: 전체 676건
+저장 완료: 낙찰 14799건, 계약 11759건
