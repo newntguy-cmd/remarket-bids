@@ -46,6 +46,11 @@ jobs:
           DAYS: ${{ inputs.days }}
         shell: bash
         run: python collect_awards.py 2>&1 | tee -a docs/run-log.txt
+      - name: Export public data
+        continue-on-error: true
+        env:
+          SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}
+        run: python export_public.py
       - name: Commit data
         if: always()
         run: |
