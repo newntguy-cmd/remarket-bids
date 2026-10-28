@@ -82,11 +82,17 @@ def main():
                 continue
             b = by_id.get(k, {})
             title = v.get("nm") or b.get("title") or ""
+            u = b.get("url") or ""
+            if u.startswith("http://"):
+                u = "https://" + u[len("http://"):]
+            if not re.match(r"^https://[a-z0-9.]*g2b\.go\.kr/", u):
+                u = ""
             rows.append({
                 "id": k, "s": status, "nm": title, "dm": v.get("dm") or b.get("demand") or "",
                 "rg": detect(b.get("site"), v.get("dm"), b.get("org"), title),
                 "kind": b.get("kind") or "", "co": v["n"], "amt": money(v.get("amt")),
                 "rate": v.get("rate") or "", "np": v.get("np") or "", "d": v.get("d") or "",
+                "u": u,
             })
     rows.sort(key=lambda r: (r["d"], r["amt"]), reverse=True)
     os.makedirs("docs", exist_ok=True)
