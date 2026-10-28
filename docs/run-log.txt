@@ -1,18 +1,1 @@
-조회 기간 202610230000 ~ 202610280947
-  구간 10-23 ~ 10-28
-전체 1812건, 1쪽 100건
-받은 공고 1812건
-저장 완료: 누적 21585건
-조회 기간 낙찰 202610230000 ~ 202610280949 / 계약 202610230000 ~ 202610280949
-getScsbidListSttusCnstwk: 전체 1495건
-getOpengResultListInfoCnstwk: 전체 1033건
-getOpengResultListInfoCnstwk: 전체 21건
-getOpengResultListInfoCnstwk: 전체 1009건
-getOpengResultListInfoCnstwk: 전체 1061건
-getOpengResultListInfoCnstwk: 전체 339건
-getOpengResultListInfoCnstwk: 전체 439건
-getOpengResultListInfoCnstwk: 전체 951건
-getOpengResultListInfoCnstwk: 전체 8건
-getCntrctInfoListCnstwk: 전체 14678건
-getCntrctInfoListCnstwk: 전체 5534건
-저장 완료: 낙찰 14712건, 계약 12583건, 개찰 1순위(낙찰 예정) 1396건
+  16쪽 시도 1/5 실패: <urlopen error _ssl.c:993: The handshake operation timed out>
