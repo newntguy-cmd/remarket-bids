@@ -1,37 +1,5 @@
-조회 기간 202608290000 ~ 202610281437
-  구간 08-29 ~ 09-12
-전체 4480건, 1쪽 100건
-  구간 09-12 ~ 09-26
-전체 3540건, 1쪽 100건
-  구간 09-26 ~ 10-10
-전체 4409건, 1쪽 100건
-  구간 10-10 ~ 10-24
-전체 5866건, 1쪽 100건
-  구간 10-24 ~ 10-28
-전체 1491건, 1쪽 100건
-받은 공고 19786건
-저장 완료: 누적 21810건
-조회 기간 낙찰 202608290000 ~ 202610281511 / 계약 202608290000 ~ 202610281511
-getScsbidListSttusCnstwk: 전체 4550건
-getScsbidListSttusCnstwk: 전체 3277건
-getScsbidListSttusCnstwk: 전체 2780건
-getScsbidListSttusCnstwk: 전체 3439건
-getScsbidListSttusCnstwk: 전체 931건
-getOpengResultListInfoCnstwk: 전체 1176건
-getOpengResultListInfoCnstwk: 전체 286건
-getOpengResultListInfoCnstwk: 전체 637건
-getOpengResultListInfoCnstwk: 전체 980건
-getOpengResultListInfoCnstwk: 전체 800건
-getOpengResultListInfoCnstwk: 전체 78건
-getOpengResultListInfoCnstwk: 전체 913건
-getOpengResultListInfoCnstwk: 전체 408건
-getCntrctInfoListCnstwk: 전체 18009건
-getCntrctInfoListCnstwk: 전체 20370건
-getCntrctInfoListCnstwk: 전체 12811건
-getCntrctInfoListCnstwk: 전체 24090건
-getCntrctInfoListCnstwk: 전체 6544건
-getCntrctInfoListCnstwk: 전체 16569건
-getCntrctInfoListCnstwk: 전체 13204건
-getCntrctInfoListCnstwk: 전체 14874건
-시간 제한으로 여기까지만 받습니다
-저장 완료: 낙찰 14978건, 계약 12646건, 개찰 1순위(낙찰 예정) 1542건
+조회 기간 202610240000 ~ 202610291020
+  구간 10-24 ~ 10-29
+전체 1918건, 1쪽 100건
+받은 공고 1918건
+저장 완료: 누적 22237건
