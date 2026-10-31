@@ -1,19 +1,49 @@
-조회 기간 202610250000 ~ 202610301024
-  구간 10-25 ~ 10-30
-전체 2505건, 1쪽 100건
-받은 공고 2506건
-저장 완료: 누적 22831건
-조회 기간 낙찰 202610250000 ~ 202610301026 / 계약 202610250000 ~ 202610301026
-getScsbidListSttusCnstwk: 전체 2020건
-getOpengResultListInfoCnstwk: 전체 1062건
-  2쪽 시도 1/5 실패: <urlopen error _ssl.c:993: The handshake operation timed out>
-getOpengResultListInfoCnstwk: 전체 1029건
-getOpengResultListInfoCnstwk: 전체 23건
-getOpengResultListInfoCnstwk: 전체 1005건
-getOpengResultListInfoCnstwk: 전체 1064건
-getOpengResultListInfoCnstwk: 전체 341건
-getOpengResultListInfoCnstwk: 전체 433건
-getOpengResultListInfoCnstwk: 전체 15건
-getCntrctInfoListCnstwk: 전체 26318건
-getCntrctInfoListCnstwk: 전체 1635건
-저장 완료: 낙찰 15677건, 계약 13425건, 개찰 1순위(낙찰 예정) 1476건
+  1쪽 시도 1/3 실패: JSON이 아닌 응답: <!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시스템 점검 안내</title>
+    <link rel="stylesheet" href="/static/info/css/common.css">
+
+  1쪽 시도 2/3 실패: JSON이 아닌 응답: <!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시스템 점검 안내</title>
+    <link rel="stylesheet" href="/static/info/css/common.css">
+
+  1쪽 시도 3/3 실패: JSON이 아닌 응답: <!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시스템 점검 안내</title>
+    <link rel="stylesheet" href="/static/info/css/common.css">
+
+키 방식 시도 실패: JSON이 아닌 응답: <!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시스템 점검 안내</title>
+    <link rel="stylesheet" href="/static/info/css/common.css">
+
+주의: 모든 키 방식이 실패했습니다(이번에는 새 공고 없이 진행): JSON이 아닌 응답: <!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시스템 점검 안내</title>
+    <link rel="stylesheet" href="/static/info/css/common.css">
+
+조회 기간 202610260000 ~ 202610311009
+  구간 10-26 ~ 10-31
+받은 공고 0건
+저장 완료: 누적 22456건
