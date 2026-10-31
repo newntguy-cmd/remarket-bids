@@ -13,7 +13,7 @@ import sys
 import rmcrypt
 
 KST = dt.timezone(dt.timedelta(hours=9))
-KEEP_DAYS = 30
+KEEP_DAYS = 60
 OUT = os.path.join("docs", "public.json")
 
 # 지역 판별 (docs/index.html 의 detect 와 같은 규칙)
