@@ -1,7 +1,8 @@
 """입찰 레이더의 잠긴 데이터를 읽어, 공개해도 되는 항목만 docs/public.json 으로 내보냅니다.
 
-공개하지 않는 것: 대표자명, 전화번호, 주소, 사업자번호(낙찰 업체 연락 정보 전부).
-공개하는 것: 공사명, 발주처, 지역, 공종, 낙찰(예정) 업체명, 금액, 낙찰률, 날짜, 참가업체 수.
+공개하지 않는 것: 대표자명, 개인사업자의 모든 연락 정보.
+공개하는 것: 공사명, 발주처, 지역, 공종, 낙찰(예정) 업체명, 금액, 낙찰률, 날짜, 참가업체 수,
+            그리고 법인(주식회사 등)에 한해 사업자번호·주소·대표 전화(조달청 등록 정보).
 환경변수 SITE_PASSWORD 가 있으면 잠긴 파일을, 없으면 평문 json 을 읽습니다.
 """
 import datetime as dt
@@ -62,6 +63,21 @@ def detect(*texts):
     return "미분류"
 
 
+CORP_NAME = re.compile(r"주식회사|\(주\)|㈜|유한회사|\(유\)|합자회사|합명회사|협동조합|농업회사법인|영농조합법인|사단법인|재단법인|\(사\)|\(재\)")
+
+
+def is_corp(name, biz):
+    """법인 여부. 사업자번호 가운데 두 자리가 81~88이면 법인, 01~79이면 개인사업자입니다."""
+    d = re.sub(r"\D", "", biz or "")
+    if len(d) == 10:
+        mid = int(d[3:5])
+        if 81 <= mid <= 88:
+            return True
+        if 1 <= mid <= 79:
+            return False
+    return bool(CORP_NAME.search(name or ""))
+
+
 def money(s):
     try:
         return int(float(str(s).replace(",", "")))
@@ -76,6 +92,7 @@ def main():
     by_id = {b["id"]: b for b in bids}
     cutoff = (now - dt.timedelta(days=KEEP_DAYS)).strftime("%Y-%m-%d")
     rows = []
+    corp = {}
     for status, src in (("낙찰", aw.get("win") or {}), ("낙찰예정", aw.get("ope") or {})):
         for k, v in src.items():
             if (v.get("d") or "") < cutoff or not v.get("n"):
@@ -87,17 +104,24 @@ def main():
                 u = "https://" + u[len("http://"):]
             if not re.match(r"^https://[a-z0-9.]*g2b\.go\.kr/", u):
                 u = ""
+            bz = re.sub(r"\D", "", v.get("b") or "")
+            cb = ""
+            if bz and is_corp(v["n"], bz):
+                cb = bz
+                if (v.get("t") or v.get("a")) and (bz not in corp or (v.get("d") or "") > corp[bz]["d"]):
+                    corp[bz] = {"a": v.get("a") or "", "t": v.get("t") or "", "d": v.get("d") or ""}
             rows.append({
                 "id": k, "s": status, "nm": title, "dm": v.get("dm") or b.get("demand") or "",
                 "rg": detect(b.get("site"), v.get("dm"), b.get("org"), title),
                 "kind": b.get("kind") or "", "co": v["n"], "amt": money(v.get("amt")),
                 "rate": v.get("rate") or "", "np": v.get("np") or "", "d": v.get("d") or "",
-                "u": u,
+                "u": u, "b": cb,
             })
     rows.sort(key=lambda r: (r["d"], r["amt"]), reverse=True)
     os.makedirs("docs", exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
-        json.dump({"updated": now.isoformat(timespec="minutes"), "n": len(rows), "items": rows}, f, ensure_ascii=False, separators=(",", ":"))
+        json.dump({"updated": now.isoformat(timespec="minutes"), "n": len(rows), "items": rows,
+                   "corp": {b: {"a": c["a"], "t": c["t"]} for b, c in corp.items()}}, f, ensure_ascii=False, separators=(",", ":"))
     print(f"공개용 {len(rows)}건 저장 ({OUT})")
 
 
