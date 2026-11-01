@@ -1,0 +1,47 @@
+name: backfill-awards
+# 낙찰 결과만 과거 며칠치를 한 번에 채웁니다(입찰 공고 수집은 건너뜀). 끝나면 공개 데이터도 바로 새로 만듭니다.
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "며칠 전 낙찰까지 채울까요"
+        default: "60"
+permissions:
+  contents: write
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install cryptography
+      - name: Collect awards
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+          SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}
+          DAYS: ${{ inputs.days }}
+        run: python collect_awards.py 2>&1 | tee -a docs/run-log.txt
+      - name: Save awards
+        if: always()
+        run: |
+          git config user.name "bid-bot"
+          git config user.email "bid-bot@users.noreply.github.com"
+          git add docs
+          git diff --cached --quiet || git commit -m "backfill awards"
+          git pull --rebase
+          git push
+      - name: Export public data
+        if: always()
+        env:
+          SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}
+        run: python export_public.py
+      - name: Commit public data
+        if: always()
+        run: |
+          git add docs/public.json
+          git diff --cached --quiet || git commit -m "update public data"
+          git pull --rebase
+          git push
