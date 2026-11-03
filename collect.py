@@ -15,7 +15,12 @@ import urllib.request
 
 import rmcrypt
 
-BASE = "https://apis.data.go.kr/1230000/ad/BidPublicInfoService"
+# 조달청이 서비스를 BidPublicInfoService02 로 옮기는 중입니다. 옛 주소를 먼저 쓰고, 막히면 새 주소로 자동 전환합니다.
+BASES = [
+    "https://apis.data.go.kr/1230000/ad/BidPublicInfoService",
+    "https://apis.data.go.kr/1230000/ad/BidPublicInfoService02",
+]
+_active = [0]
 OP = "getBidPblancListInfoCnstwk"  # 입찰공고목록 정보에 대한 공사조회
 KST = dt.timezone(dt.timedelta(hours=9))
 DATA = os.path.join("docs", "data.json")
@@ -43,14 +48,26 @@ def call(key, page, begin, end, rows=100):
         "inqryBgnDt": begin,
         "inqryEndDt": end,
     }
-    url = f"{BASE}/{OP}?{urllib.parse.urlencode(params, quote_via=urllib.parse.quote)}"
-    req = urllib.request.Request(url, headers={"User-Agent": "remarket-bids/1.0"})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        text = r.read().decode("utf-8", "replace")
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        raise RuntimeError("JSON이 아닌 응답: " + text[:300])
+    q = urllib.parse.urlencode(params, quote_via=urllib.parse.quote)
+    last = None
+    for off in range(len(BASES)):
+        i = (_active[0] + off) % len(BASES)
+        req = urllib.request.Request(f"{BASES[i]}/{OP}?{q}", headers={"User-Agent": "remarket-bids/1.0"})
+        try:
+            with urllib.request.urlopen(req, timeout=60) as r:
+                text = r.read().decode("utf-8", "replace")
+            resp = json.loads(text)
+            code = str(resp.get("response", {}).get("header", {}).get("resultCode", ""))
+            if code and code != "00":
+                raise RuntimeError(f"API 오류 {code}")
+        except (urllib.error.HTTPError, json.JSONDecodeError, RuntimeError) as e:
+            last = e if not isinstance(e, json.JSONDecodeError) else RuntimeError("JSON이 아닌 응답: " + text[:300])
+            continue  # 다른 주소로 시도
+        if i != _active[0]:
+            print(f"[알림] 입찰공고 API 주소를 전환했습니다: {BASES[i]}", flush=True)
+            _active[0] = i
+        return resp
+    raise last
 
 
 def parse(resp):
