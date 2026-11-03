@@ -21,6 +21,7 @@ BASES = [
     "https://apis.data.go.kr/1230000/ad/BidPublicInfoService02",
 ]
 _active = [0]
+API_DOWN = [False]  # 모든 주소·키가 실패하면 True → 실행 끝에서 오류로 종료해 GitHub 알림 메일이 가게 합니다
 OP = "getBidPblancListInfoCnstwk"  # 입찰공고목록 정보에 대한 공사조회
 KST = dt.timezone(dt.timedelta(hours=9))
 DATA = os.path.join("docs", "data.json")
@@ -114,6 +115,7 @@ def fetch_all(begin, end):
             print(f"키 방식 시도 실패: {e}", file=sys.stderr)
     if key is None:
         print(f"주의: 모든 키 방식이 실패했습니다(이번에는 새 공고 없이 진행): {last_err}", file=sys.stderr)
+        API_DOWN[0] = True
         return []
     out = list(first)
     print(f"전체 {total}건, 1쪽 {len(first)}건")
@@ -209,3 +211,5 @@ def main():
 
 
 main()
+if API_DOWN[0]:
+    sys.exit("입찰공고 API 호출이 모두 실패했습니다. 저장된 데이터는 그대로입니다. 주소 변경·인증키 상태를 확인하세요.")
