@@ -3,3 +3,17 @@
 전체 1779건, 1쪽 100건
 받은 공고 1779건
 저장 완료: 누적 23358건
+조회 기간 낙찰 202611060000 ~ 202611111033 / 계약 202611060000 ~ 202611111033
+getScsbidListSttusCnstwk: 전체 1466건
+getOpengResultListInfoCnstwk: 전체 1060건
+getOpengResultListInfoCnstwk: 전체 30건
+getOpengResultListInfoCnstwk: 전체 965건
+getOpengResultListInfoCnstwk: 전체 1222건
+getOpengResultListInfoCnstwk: 전체 281건
+getOpengResultListInfoCnstwk: 전체 455건
+getOpengResultListInfoCnstwk: 전체 1062건
+getOpengResultListInfoCnstwk: 전체 15건
+getCntrctInfoListCnstwk: 전체 15647건
+  3쪽 시도 1/5 실패: <urlopen error _ssl.c:994: The handshake operation timed out>
+getCntrctInfoListCnstwk: 전체 5843건
+저장 완료: 낙찰 15957건, 계약 15176건, 개찰 1순위(낙찰 예정) 1625건
