@@ -3,3 +3,16 @@
 전체 2229건, 1쪽 100건
 받은 공고 2229건
 저장 완료: 누적 24328건
+조회 기간 낙찰 202611120000 ~ 202611171315 / 계약 202611120000 ~ 202611171315
+getScsbidListSttusCnstwk: 전체 1531건
+getOpengResultListInfoCnstwk: 전체 807건
+getOpengResultListInfoCnstwk: 전체 184건
+getOpengResultListInfoCnstwk: 전체 938건
+getOpengResultListInfoCnstwk: 전체 1369건
+getOpengResultListInfoCnstwk: 전체 50건
+getOpengResultListInfoCnstwk: 전체 707건
+getOpengResultListInfoCnstwk: 전체 1086건
+getOpengResultListInfoCnstwk: 전체 408건
+getCntrctInfoListCnstwk: 전체 14043건
+getCntrctInfoListCnstwk: 전체 9282건
+저장 완료: 낙찰 16502건, 계약 15718건, 개찰 1순위(낙찰 예정) 1877건
