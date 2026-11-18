@@ -16,6 +16,7 @@ import rmcrypt
 KST = dt.timezone(dt.timedelta(hours=9))
 KEEP_DAYS = 60
 OUT = os.path.join("docs", "public.json")
+OUT_BIDS = os.path.join("docs", "bids.json")
 
 # 지역 판별 (docs/index.html 의 detect 와 같은 규칙)
 PRE = [("광주시", "경기"), ("전남광주", "광주·전남"), ("BIFC", "부산")]
@@ -85,6 +86,32 @@ def money(s):
         return 0
 
 
+def export_bids(bids, now):
+    """진행 중인 입찰공고를 공개용으로 내보냅니다. 담당자 이름·전화·첨부파일은 넣지 않습니다."""
+    today = now.strftime("%Y-%m-%d")
+    out = []
+    for b in bids:
+        cl = (b.get("close") or "")
+        if not cl or cl[:10] < today:
+            continue
+        u = b.get("url") or ""
+        if u.startswith("http://"):
+            u = "https://" + u[len("http://"):]
+        if not re.match(r"^https://[a-z0-9.]*g2b\.go\.kr/", u):
+            u = ""
+        title = b.get("title") or ""
+        out.append({
+            "id": b["id"], "nm": title, "og": b.get("org") or "", "dm": b.get("demand") or "",
+            "pd": (b.get("posted") or "")[:10], "cl": cl[:16], "op": (b.get("open") or "")[:16],
+            "pr": money(b.get("price")), "rg": detect(b.get("site"), b.get("demand"), b.get("org"), title),
+            "kind": b.get("kind") or "", "ar": b.get("area_ok") or "", "m": b.get("method") or "", "u": u,
+        })
+    out.sort(key=lambda r: (r["cl"], r["id"]))
+    with open(OUT_BIDS, "w", encoding="utf-8") as f:
+        json.dump({"updated": now.isoformat(timespec="minutes"), "n": len(out), "items": out}, f, ensure_ascii=False, separators=(",", ":"))
+    print(f"입찰공고 {len(out)}건 저장 ({OUT_BIDS})")
+
+
 def main():
     now = dt.datetime.now(KST)
     bids = (rmcrypt.load("data") or {}).get("items", [])
@@ -123,6 +150,7 @@ def main():
         json.dump({"updated": now.isoformat(timespec="minutes"), "n": len(rows), "items": rows,
                    "corp": {b: {"a": c["a"], "t": c["t"]} for b, c in corp.items()}}, f, ensure_ascii=False, separators=(",", ":"))
     print(f"공개용 {len(rows)}건 저장 ({OUT})")
+    export_bids(bids, now)
 
 
 if __name__ == "__main__":
