@@ -1,18 +1,5 @@
-조회 기간 202611140000 ~ 202611191152
-  구간 11-14 ~ 11-19
-전체 2362건, 1쪽 100건
-받은 공고 2362건
-저장 완료: 누적 25263건
-조회 기간 낙찰 202611140000 ~ 202611191154 / 계약 202611140000 ~ 202611191154
-getScsbidListSttusCnstwk: 전체 1667건
-getOpengResultListInfoCnstwk: 전체 1159건
-getOpengResultListInfoCnstwk: 전체 739건
-getOpengResultListInfoCnstwk: 전체 224건
-getOpengResultListInfoCnstwk: 전체 949건
-getOpengResultListInfoCnstwk: 전체 1321건
-getOpengResultListInfoCnstwk: 전체 45건
-getOpengResultListInfoCnstwk: 전체 743건
-getOpengResultListInfoCnstwk: 전체 234건
-getCntrctInfoListCnstwk: 전체 23500건
-getCntrctInfoListCnstwk: 전체 386건
-저장 완료: 낙찰 17168건, 계약 16109건, 개찰 1순위(낙찰 예정) 1933건
+조회 기간 202611150000 ~ 202611201142
+  구간 11-15 ~ 11-20
+전체 3047건, 1쪽 100건
+받은 공고 3047건
+저장 완료: 누적 25984건
