@@ -4,3 +4,22 @@
 전체 2722건, 1쪽 100건
 받은 공고 2722건
 저장 완료: 누적 25478건
+조회 기간 낙찰 202611170000 ~ 202611221046 / 계약 202611170000 ~ 202611221046
+  1쪽 시도 1/3 실패: <urlopen error _ssl.c:994: The handshake operation timed out>
+getScsbidListSttusCnstwk: 전체 2075건
+getOpengResultListInfoCnstwk: 전체 589건
+getOpengResultListInfoCnstwk: 전체 1125건
+  2쪽 시도 1/5 실패: <urlopen error _ssl.c:994: The handshake operation timed out>
+getOpengResultListInfoCnstwk: 전체 1052건
+  2쪽 시도 1/5 실패: <urlopen error _ssl.c:994: The handshake operation timed out>
+getOpengResultListInfoCnstwk: 전체 10건
+getOpengResultListInfoCnstwk: 전체 873건
+getOpengResultListInfoCnstwk: 전체 1259건
+getOpengResultListInfoCnstwk: 전체 392건
+getOpengResultListInfoCnstwk: 전체 3건
+getCntrctInfoListCnstwk: 전체 18676건
+  3쪽 시도 1/5 실패: <urlopen error _ssl.c:994: The handshake operation timed out>
+  6쪽 시도 1/5 실패: <urlopen error _ssl.c:994: The handshake operation timed out>
+  10쪽 시도 1/5 실패: <urlopen error _ssl.c:994: The handshake operation timed out>
+getCntrctInfoListCnstwk: 전체 8835건
+저장 완료: 낙찰 17304건, 계약 16496건, 개찰 1순위(낙찰 예정) 1854건
