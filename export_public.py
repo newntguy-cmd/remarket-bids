@@ -159,7 +159,10 @@ def bizno_lookup(biz, ua, name=""):
         tx = re.sub(r"\s+", " ", tx)
         k = tx.find(biz[:3] + "-" + biz[3:5])
         print("  [비즈노 검색화면] 길이", len(page), "링크", re.findall(r'href="(/[^"]{3,60})"', page)[:12])
-        print("  [비즈노 검색화면] 본문", tx[max(0, k - 100):k + 500] if k >= 0 else tx[:500])
+        hs = [h for h in re.findall(r'href="([^"]+)"', page) if "css" not in h and "png" not in h and "js" not in h]
+        print("  [비즈노 검색화면] 링크전체", hs[:40])
+        j = tx.find("검색결과")
+        print("  [비즈노 검색화면] 결과부", tx[j:j + 900] if j >= 0 else tx[-900:])
     link = re.search(r'href="(/article/[^"#?]+|/\d{3}-?\d{2}-?\d{5}[^"]*)"', page)
     if link:
         page = get("https://bizno.net" + link.group(1))
