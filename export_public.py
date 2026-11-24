@@ -132,6 +132,7 @@ def _items(j):
 
 
 BIZNO_MAX = 150
+_DBG = 0
 
 
 def bizno_lookup(biz, ua, name=""):
@@ -151,6 +152,14 @@ def bizno_lookup(biz, ua, name=""):
         return H.unescape(re.sub(r"<[^>]+>", " ", m.group(1))).strip() if m else ""
 
     page = get("https://bizno.net/?query=" + biz)
+    global _DBG
+    if _DBG < 2:
+        _DBG += 1
+        tx = H.unescape(re.sub(r"<[^>]+>", " ", page))
+        tx = re.sub(r"\s+", " ", tx)
+        k = tx.find(biz[:3] + "-" + biz[3:5])
+        print("  [비즈노 검색화면] 길이", len(page), "링크", re.findall(r'href="(/[^"]{3,60})"', page)[:12])
+        print("  [비즈노 검색화면] 본문", tx[max(0, k - 100):k + 500] if k >= 0 else tx[:500])
     link = re.search(r'href="(/article/[^"#?]+|/\d{3}-?\d{2}-?\d{5}[^"]*)"', page)
     if link:
         page = get("https://bizno.net" + link.group(1))
