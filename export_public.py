@@ -122,6 +122,11 @@ def main():
     corp = {}
     for status, src in (("낙찰", aw.get("win") or {}), ("낙찰예정", aw.get("ope") or {})):
         for k, v in src.items():
+            # 연락처는 최근 낙찰이 아니어도 모읍니다: 방금 낙찰된 업체는 계약이 아직 없어서, 예전 계약의 전화·주소를 대신 씁니다
+            bz0 = re.sub(r"\D", "", v.get("b") or "")
+            if bz0 and v.get("n") and (v.get("t") or v.get("a")) and is_corp(v["n"], bz0):
+                if bz0 not in corp or (v.get("d") or "") > corp[bz0]["d"]:
+                    corp[bz0] = {"a": v.get("a") or "", "t": v.get("t") or "", "d": v.get("d") or ""}
             if (v.get("d") or "") < cutoff or not v.get("n"):
                 continue
             b = by_id.get(k, {})
