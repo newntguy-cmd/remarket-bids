@@ -42,3 +42,19 @@ getCntrctInfoListCnstwk: 전체 10472건
 연락처 보충(비즈노): 50곳 조회, 0곳 채움
 공개용 19840건 저장 (docs/public.json)
 입찰공고 2853건 저장 (docs/bids.json)
+연락처 보충 대상 1400곳 (이번 실행 최대 600곳)
+  오류: 3 HTTP Error 403: Forbidden
+  오류: 1 HTTP Error 403: Forbidden
+  오류: 3 HTTP Error 403: Forbidden
+  조달청 조회 중단(시간 5초, 연속 실패 8회)
+연락처 보충(조달청 등록정보): 4곳 조회, 0곳 채움
+  [비즈노 검색화면] 길이 16192 링크 ['/favicon.png', '/favicon.png', '/css/linearicons.css', '/css/font-awesome.min.css', '/css/bootstrap.css', '/css/magnific-popup.css', '/css/nice-select.css', '/css/animate.min.css', '/css/owl.carousel.css', '/css/main.css?v=333', '/사업자등록번호조회/', '/법인등록번호조회/']
+  [비즈노 검색화면] 본문  5148156230 (function() {function signalGooglefcPresent() {if (!window.frames['googlefcPresent']) {if (document.body) {const iframe = document.createElement('iframe'); iframe.style = 'width: 0; height: 0; border: none; z-index: -1000; left: -1000px; top: -1000px;'; iframe.style.display = 'none'; iframe.name = 'googlefcPresent'; document.body.appendChild(iframe);} else {setTimeout(signalGooglefcPresent, 0);}}}signalGooglefcPresent();})(); Home 사업자등록번호조회 법인등록번호조회 상호명으로 사업자등록번호조회 전화번호로 조회 대표자이름으로 조
+  비즈노 결과 예시: 5148156230 None
+  [비즈노 검색화면] 길이 16208 링크 ['/favicon.png', '/favicon.png', '/css/linearicons.css', '/css/font-awesome.min.css', '/css/bootstrap.css', '/css/magnific-popup.css', '/css/nice-select.css', '/css/animate.min.css', '/css/owl.carousel.css', '/css/main.css?v=333', '/사업자등록번호조회/', '/법인등록번호조회/']
+  [비즈노 검색화면] 본문  4118101343 (function() {function signalGooglefcPresent() {if (!window.frames['googlefcPresent']) {if (document.body) {const iframe = document.createElement('iframe'); iframe.style = 'width: 0; height: 0; border: none; z-index: -1000; left: -1000px; top: -1000px;'; iframe.style.display = 'none'; iframe.name = 'googlefcPresent'; document.body.appendChild(iframe);} else {setTimeout(signalGooglefcPresent, 0);}}}signalGooglefcPresent();})(); Home 사업자등록번호조회 법인등록번호조회 상호명으로 사업자등록번호조회 전화번호로 조회 대표자이름으로 조
+  비즈노 결과 예시: 4118101343 None
+  비즈노 조회 중단(시간 241초, 연속 실패 0회)
+연락처 보충(비즈노): 53곳 조회, 0곳 채움
+공개용 19840건 저장 (docs/public.json)
+입찰공고 2853건 저장 (docs/bids.json)
