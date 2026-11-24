@@ -275,7 +275,7 @@ def fill_missing(rows, corp, now):
                 cache[b] = f
                 corp[b] = dict(f)
                 g2 += 1
-            time.sleep(2.0)
+            _t.sleep(2.0)
         print(f"연락처 보충(비즈노): {n2}곳 조회, {g2}곳 채움")
     rmcrypt.save("corpx", cache)
 
