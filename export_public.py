@@ -134,7 +134,7 @@ def _items(j):
 BIZNO_MAX = 150
 
 
-def bizno_lookup(biz, ua):
+def bizno_lookup(biz, ua, name=""):
     """비즈노(bizno.net) 검색 화면에서 사업자번호로 전화·주소를 찾습니다. 못 찾으면 None."""
     import urllib.parse
     import urllib.request
@@ -154,6 +154,15 @@ def bizno_lookup(biz, ua):
     link = re.search(r'href="(/article/[^"#?]+|/\d{3}-?\d{2}-?\d{5}[^"]*)"', page)
     if link:
         page = get("https://bizno.net" + link.group(1))
+    fmt = f"{biz[:3]}-{biz[3:5]}-{biz[5:]}"
+    core = re.sub(r"주식회사|\(주\)|㈜|\s", "", name or "")
+    text = H.unescape(re.sub(r"<[^>]+>", " ", page))
+    if fmt not in text and biz not in text:
+        return None  # 다른 업체 화면: 쓰지 않음
+    if core and core not in re.sub(r"\s", "", text):
+        return None
+    i = text.find(fmt) if fmt in text else text.find(biz)
+    page = page[max(0, page.find(fmt) if fmt in page else (page.find(biz) if biz in page else 0)):][:6000]
     t = pick(page, "전화번호")
     a = pick(page, "(?:사업장\\s*)?주소")
     t = _clean(re.sub(r"[^0-9\-]", "", t)) if re.search(r"\d{2,4}-\d{3,4}-\d{4}", t) else ""
@@ -180,6 +189,8 @@ def fill_missing(rows, corp, now):
         if c and (_clean(c.get("t")) or _clean(c.get("a"))):
             continue
         hit = cache.get(b)
+        if hit and (hit.get("t") or hit.get("a")) and hit.get("v") != 2 and hit.get("s") != "g2b":
+            hit = None
         if hit and (hit.get("t") or hit.get("a")):
             corp[b] = {"a": hit.get("a", ""), "t": hit.get("t", ""), "d": hit.get("d", "")}
             continue
@@ -227,6 +238,7 @@ def fill_missing(rows, corp, now):
             if found:
                 break
         if found:
+            found["s"] = "g2b"
             cache[b] = found
             corp[b] = dict(found)
             got += 1
@@ -251,6 +263,7 @@ def fill_missing(rows, corp, now):
     if not allow:
         print("  비즈노 robots.txt 가 막고 있어 조회하지 않습니다")
     else:
+        names = {r["b"]: r.get("co") or "" for r in rows if r.get("b")}
         n2 = g2 = 0
         tb = _t.time()
         bf = 0
@@ -261,7 +274,7 @@ def fill_missing(rows, corp, now):
                 break
             n2 += 1
             try:
-                f = bizno_lookup(b, ua)
+                f = bizno_lookup(b, ua, names.get(b, ""))
                 bf = 0
             except Exception as e:
                 bf += 1
@@ -272,6 +285,7 @@ def fill_missing(rows, corp, now):
                 print("  비즈노 결과 예시:", b, f)
             if f:
                 f["d"] = today
+                f["v"] = 2
                 cache[b] = f
                 corp[b] = dict(f)
                 g2 += 1
