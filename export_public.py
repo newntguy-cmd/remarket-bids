@@ -141,7 +141,7 @@ def bizno_lookup(biz, ua):
     import html as H
 
     def get(u):
-        with urllib.request.urlopen(urllib.request.Request(u, headers={"User-Agent": ua, "Accept-Language": "ko"}), timeout=30) as r:
+        with urllib.request.urlopen(urllib.request.Request(u, headers={"User-Agent": ua, "Accept-Language": "ko"}), timeout=10) as r:
             return r.read().decode("utf-8", "replace")
 
     def pick(page, label):
@@ -190,24 +190,32 @@ def fill_missing(rows, corp, now):
     key = urllib.parse.unquote(raw)
     got = tried = 0
     shown = 0
+    import time as _t
+    t0 = _t.time()
+    fails = 0
     for b in need[:FILL_MAX]:
+        if _t.time() - t0 > 240 or fails >= 8:
+            print(f"  조달청 조회 중단(시간 {int(_t.time() - t0)}초, 연속 실패 {fails}회)")
+            break
         tried += 1
         found = None
         for extra in ({"inqryDiv": "3", "bizno": b}, {"inqryDiv": "1", "bizno": b}):
             q = {"serviceKey": key, "pageNo": 1, "numOfRows": 5, "type": "json"}
             q.update(extra)
             try:
-                with urllib.request.urlopen(urllib.request.Request(CORP_URL + "?" + urllib.parse.urlencode(q, quote_via=urllib.parse.quote), headers={"User-Agent": "remarket-bids/1.0"}), timeout=30) as resp:
+                with urllib.request.urlopen(urllib.request.Request(CORP_URL + "?" + urllib.parse.urlencode(q, quote_via=urllib.parse.quote), headers={"User-Agent": "remarket-bids/1.0"}), timeout=8) as resp:
                     txt = resp.read().decode("utf-8", "replace")
                 if shown < 3:
                     print("  응답 예시:", extra.get("inqryDiv"), txt[:400].replace("\n", " "))
                     shown += 1
                 its = _items(json.loads(txt))
             except Exception as e:
+                fails += 1
                 if shown < 3:
                     print("  오류:", extra.get("inqryDiv"), str(e)[:200])
                     shown += 1
                 continue
+            fails = 0
             for it in its:
                 if re.sub(r"\D", "", str(it.get("bizno") or it.get("bizrno") or b)) != b:
                     continue
@@ -226,7 +234,6 @@ def fill_missing(rows, corp, now):
             cache[b] = {"x": today}
     print(f"연락처 보충(조달청 등록정보): {tried}곳 조회, {got}곳 채움")
     # 2차: 조달청에도 없으면 비즈노에서 사업자번호로 찾습니다 (robots.txt 가 막으면 하지 않고, 천천히 소량만)
-    import time
     import urllib.request
     ua = "Mozilla/5.0 (compatible; ilgammarket-bot/1.0; +https://ilgammarket.co.kr)"
     allow = True
@@ -245,12 +252,19 @@ def fill_missing(rows, corp, now):
         print("  비즈노 robots.txt 가 막고 있어 조회하지 않습니다")
     else:
         n2 = g2 = 0
+        tb = _t.time()
+        bf = 0
         left = [b for b in need if not (cache.get(b) or {}).get("t") and not (cache.get(b) or {}).get("a")]
         for b in left[:BIZNO_MAX]:
+            if _t.time() - tb > 240 or bf >= 5:
+                print(f"  비즈노 조회 중단(시간 {int(_t.time() - tb)}초, 연속 실패 {bf}회)")
+                break
             n2 += 1
             try:
                 f = bizno_lookup(b, ua)
+                bf = 0
             except Exception as e:
+                bf += 1
                 if n2 <= 3:
                     print("  비즈노 오류:", str(e)[:160])
                 f = None
