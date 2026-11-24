@@ -19,12 +19,13 @@ jobs:
       - name: Export public data
         env:
           SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}
-        run: python export_public.py
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: python export_public.py 2>&1 | tee -a docs/run-log.txt
       - name: Commit
         run: |
           git config user.name "bid-bot"
           git config user.email "bid-bot@users.noreply.github.com"
-          git add docs/public.json docs/bids.json
+          git add docs/public.json docs/bids.json docs/corpx.enc docs/run-log.txt
           git diff --cached --quiet || git commit -m "update public data"
           git pull --rebase
           git push

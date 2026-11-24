@@ -112,6 +112,92 @@ def export_bids(bids, now):
     print(f"입찰공고 {len(out)}건 저장 ({OUT_BIDS})")
 
 
+CORP_URL = "https://apis.data.go.kr/1230000/ao/UsrInfoService02/getPrcrmntCorpBasicInfo02"
+FILL_MAX = 600
+
+
+def _clean(v):
+    v = (v or "").strip()
+    return "" if "*" in v else v
+
+
+def _items(j):
+    b = (j.get("response") or j).get("body") or {}
+    it = b.get("items")
+    if isinstance(it, dict):
+        it = it.get("item")
+    if isinstance(it, dict):
+        it = [it]
+    return it or []
+
+
+def fill_missing(rows, corp, now):
+    """낙찰 결과에 전화·주소가 비어 있거나 가려진 법인은 조달업체 등록정보(사업자번호 조회)에서 채웁니다."""
+    import urllib.parse
+    import urllib.request
+    raw = os.environ.get("DATA_GO_KR_KEY", "").strip()
+    if not raw:
+        print("DATA_GO_KR_KEY 없음: 연락처 보충 건너뜀")
+        return
+    cache = rmcrypt.load("corpx") or {}
+    today = now.strftime("%Y-%m-%d")
+    need = []
+    for r in rows:
+        b = r.get("b")
+        if not b or b in need:
+            continue
+        c = corp.get(b)
+        if c and (_clean(c.get("t")) or _clean(c.get("a"))):
+            continue
+        hit = cache.get(b)
+        if hit and (hit.get("t") or hit.get("a")):
+            corp[b] = {"a": hit.get("a", ""), "t": hit.get("t", ""), "d": hit.get("d", "")}
+            continue
+        if hit and (hit.get("x") or "") >= (now - dt.timedelta(days=7)).strftime("%Y-%m-%d"):
+            continue
+        need.append(b)
+    print(f"연락처 보충 대상 {len(need)}곳 (이번 실행 최대 {FILL_MAX}곳)")
+    key = urllib.parse.unquote(raw)
+    got = tried = 0
+    shown = 0
+    for b in need[:FILL_MAX]:
+        tried += 1
+        found = None
+        for extra in ({"inqryDiv": "3", "bizno": b}, {"inqryDiv": "1", "bizno": b}):
+            q = {"serviceKey": key, "pageNo": 1, "numOfRows": 5, "type": "json"}
+            q.update(extra)
+            try:
+                with urllib.request.urlopen(urllib.request.Request(CORP_URL + "?" + urllib.parse.urlencode(q, quote_via=urllib.parse.quote), headers={"User-Agent": "remarket-bids/1.0"}), timeout=30) as resp:
+                    txt = resp.read().decode("utf-8", "replace")
+                if shown < 3:
+                    print("  응답 예시:", extra.get("inqryDiv"), txt[:400].replace("\n", " "))
+                    shown += 1
+                its = _items(json.loads(txt))
+            except Exception as e:
+                if shown < 3:
+                    print("  오류:", extra.get("inqryDiv"), str(e)[:200])
+                    shown += 1
+                continue
+            for it in its:
+                if re.sub(r"\D", "", str(it.get("bizno") or it.get("bizrno") or b)) != b:
+                    continue
+                t = _clean(it.get("telNo") or it.get("tel") or "")
+                a = _clean(" ".join(x for x in (it.get("adrs") or it.get("rgnAdrs") or "", it.get("dtlAdrs") or "") if x))
+                if t or a:
+                    found = {"a": a, "t": t, "d": today}
+                    break
+            if found:
+                break
+        if found:
+            cache[b] = found
+            corp[b] = dict(found)
+            got += 1
+        else:
+            cache[b] = {"x": today}
+    print(f"연락처 보충: {tried}곳 조회, {got}곳 채움")
+    rmcrypt.save("corpx", cache)
+
+
 def main():
     now = dt.datetime.now(KST)
     bids = (rmcrypt.load("data") or {}).get("items", [])
@@ -150,6 +236,10 @@ def main():
                 "u": u, "b": cb,
             })
     rows.sort(key=lambda r: (r["d"], r["amt"]), reverse=True)
+    try:
+        fill_missing(rows, corp, now)
+    except Exception as e:
+        print("연락처 보충 실패(건너뜀):", str(e)[:200])
     os.makedirs("docs", exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump({"updated": now.isoformat(timespec="minutes"), "n": len(rows), "items": rows,
