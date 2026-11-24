@@ -76,3 +76,12 @@ getCntrctInfoListCnstwk: 전체 10472건
 연락처 보충(비즈노): 57곳 조회, 0곳 채움
 공개용 19840건 저장 (docs/public.json)
 입찰공고 2853건 저장 (docs/bids.json)
+연락처 보충 대상 1392곳 (이번 실행 최대 600곳)
+  오류: 3 HTTP Error 403: Forbidden
+  오류: 1 HTTP Error 403: Forbidden
+  오류: 3 HTTP Error 403: Forbidden
+  조달청 조회 중단(시간 7초, 연속 실패 8회)
+연락처 보충(조달청 등록정보): 4곳 조회, 0곳 채움
+  비즈노 화면 조회는 꺼져 있습니다(정식 API 사용 전까지)
+공개용 19840건 저장 (docs/public.json)
+입찰공고 2853건 저장 (docs/bids.json)
