@@ -131,6 +131,36 @@ def _items(j):
     return it or []
 
 
+BIZNO_MAX = 150
+
+
+def bizno_lookup(biz, ua):
+    """비즈노(bizno.net) 검색 화면에서 사업자번호로 전화·주소를 찾습니다. 못 찾으면 None."""
+    import urllib.parse
+    import urllib.request
+    import html as H
+
+    def get(u):
+        with urllib.request.urlopen(urllib.request.Request(u, headers={"User-Agent": ua, "Accept-Language": "ko"}), timeout=30) as r:
+            return r.read().decode("utf-8", "replace")
+
+    def pick(page, label):
+        m = re.search(label + r"\s*</(?:th|dt|td|span|b|strong)>\s*<(?:td|dd|span)[^>]*>(.*?)</(?:td|dd|span)>", page, re.S)
+        if not m:
+            m = re.search(label + r"[^<\n]{0,6}[:\s]*</?[^>]*>\s*([^<]{4,120})", page)
+        return H.unescape(re.sub(r"<[^>]+>", " ", m.group(1))).strip() if m else ""
+
+    page = get("https://bizno.net/?query=" + biz)
+    link = re.search(r'href="(/article/[^"#?]+|/\d{3}-?\d{2}-?\d{5}[^"]*)"', page)
+    if link:
+        page = get("https://bizno.net" + link.group(1))
+    t = pick(page, "전화번호")
+    a = pick(page, "(?:사업장\\s*)?주소")
+    t = _clean(re.sub(r"[^0-9\-]", "", t)) if re.search(r"\d{2,4}-\d{3,4}-\d{4}", t) else ""
+    a = _clean(a)
+    return {"a": a, "t": t} if (t or a) else None
+
+
 def fill_missing(rows, corp, now):
     """낙찰 결과에 전화·주소가 비어 있거나 가려진 법인은 조달업체 등록정보(사업자번호 조회)에서 채웁니다."""
     import urllib.parse
@@ -194,7 +224,45 @@ def fill_missing(rows, corp, now):
             got += 1
         else:
             cache[b] = {"x": today}
-    print(f"연락처 보충: {tried}곳 조회, {got}곳 채움")
+    print(f"연락처 보충(조달청 등록정보): {tried}곳 조회, {got}곳 채움")
+    # 2차: 조달청에도 없으면 비즈노에서 사업자번호로 찾습니다 (robots.txt 가 막으면 하지 않고, 천천히 소량만)
+    import time
+    import urllib.request
+    ua = "Mozilla/5.0 (compatible; ilgammarket-bot/1.0; +https://ilgammarket.co.kr)"
+    allow = True
+    try:
+        rb = urllib.request.urlopen(urllib.request.Request("https://bizno.net/robots.txt", headers={"User-Agent": ua}), timeout=20).read().decode("utf-8", "replace")
+        grp = False
+        for ln in rb.splitlines():
+            l = ln.split("#")[0].strip().lower()
+            if l.startswith("user-agent:"):
+                grp = l.split(":", 1)[1].strip() == "*"
+            elif grp and l.startswith("disallow:") and l.split(":", 1)[1].strip() in ("/", "/?query", "/?"):
+                allow = False
+    except Exception as e:
+        print("  비즈노 robots.txt 확인 실패:", str(e)[:120])
+    if not allow:
+        print("  비즈노 robots.txt 가 막고 있어 조회하지 않습니다")
+    else:
+        n2 = g2 = 0
+        left = [b for b in need if not (cache.get(b) or {}).get("t") and not (cache.get(b) or {}).get("a")]
+        for b in left[:BIZNO_MAX]:
+            n2 += 1
+            try:
+                f = bizno_lookup(b, ua)
+            except Exception as e:
+                if n2 <= 3:
+                    print("  비즈노 오류:", str(e)[:160])
+                f = None
+            if n2 <= 2:
+                print("  비즈노 결과 예시:", b, f)
+            if f:
+                f["d"] = today
+                cache[b] = f
+                corp[b] = dict(f)
+                g2 += 1
+            time.sleep(2.0)
+        print(f"연락처 보충(비즈노): {n2}곳 조회, {g2}곳 채움")
     rmcrypt.save("corpx", cache)
 
 
