@@ -131,7 +131,7 @@ def _items(j):
     return it or []
 
 
-BIZNO_MAX = 150
+BIZNO_MAX = 0  # 비즈노는 화면 수집을 약관상 금지(무단 수집은 저작권·정보통신망법 위반 소지): 정식 API 키가 생기기 전까지 끔
 _DBG = 0
 
 
@@ -272,7 +272,9 @@ def fill_missing(rows, corp, now):
                 allow = False
     except Exception as e:
         print("  비즈노 robots.txt 확인 실패:", str(e)[:120])
-    if not allow:
+    if BIZNO_MAX <= 0:
+        print("  비즈노 화면 조회는 꺼져 있습니다(정식 API 사용 전까지)")
+    elif not allow:
         print("  비즈노 robots.txt 가 막고 있어 조회하지 않습니다")
     else:
         names = {r["b"]: r.get("co") or "" for r in rows if r.get("b")}
