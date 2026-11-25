@@ -115,3 +115,16 @@ getCntrctInfoListCnstwk: 전체 10472건
   비즈노 화면 조회는 꺼져 있습니다(정식 API 사용 전까지)
 공개용 19840건 저장 (docs/public.json)
 입찰공고 2853건 저장 (docs/bids.json)
+  [확인] 1058174543 3 {'bizno': '1058174543', 'corpNm': '주식회사 태영건설', 'telNo': '02-2151-6999', 'faxNo': '02-2090-2243', 'adrs': '경기도 광명시 신기로', 'dtlAdrs': '20 (일직동)'}
+  [확인] 1058174543 1 결과 없음 {"nkoneps.com.response.ResponseError": {   "header": {     "resultCode": "08",     "resultMsg": "필수값 입력 에러"   } }}
+  [확인] 5018115795 3 {'bizno': '5018115795', 'corpNm': '주식회사 화성개발', 'telNo': '053-715-3049', 'faxNo': '053-715-3010', 'adrs': '대구광역시 북구 원대로', 'dtlAdrs': '130-0 (침산동, 파크드림 갤러리)'}
+  [확인] 5018115795 1 결과 없음 {"nkoneps.com.response.ResponseError": {   "header": {     "resultCode": "08",     "resultMsg": "필수값 입력 에러"   } }}
+  [확인] 5108601247 3 {'bizno': '5108601247', 'corpNm': '고려기업 주식회사', 'telNo': '02-476-6100', 'faxNo': '02-476-0155', 'adrs': '서울특별시 강동구 성내로6길', 'dtlAdrs': '42, 5층 503호 (성내동)'}
+  [확인] 5108601247 1 결과 없음 {"nkoneps.com.response.ResponseError": {   "header": {     "resultCode": "08",     "resultMsg": "필수값 입력 에러"   } }}
+  [확인] 4098118123 3 {'bizno': '4098118123', 'corpNm': '대호전기 주식회사', 'telNo': '061-353-6168', 'faxNo': '061-353-6169', 'adrs': '전남광주통합특별시 영광군 백수읍 해안로', 'dtlAdrs': '1362-70'}
+  [확인] 4098118123 1 결과 없음 {"nkoneps.com.response.ResponseError": {   "header": {     "resultCode": "08",     "resultMsg": "필수값 입력 에러"   } }}
+연락처 보충 대상 0곳 (이번 실행 최대 1500곳)
+연락처 보충(조달청 등록정보): 0곳 조회, 0곳 채움
+  비즈노 화면 조회는 꺼져 있습니다(정식 API 사용 전까지)
+공개용 19840건 저장 (docs/public.json)
+입찰공고 2853건 저장 (docs/bids.json)
