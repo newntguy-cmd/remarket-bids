@@ -233,6 +233,8 @@ def fill_missing(rows, corp, now):
             continue
         need.append(b)
     print(f"연락처 보충 대상 {len(need)}곳 (이번 실행 최대 {FILL_MAX}곳)")
+    for b in ("1058174543", "5018115795"):
+        print("  [상태]", b, "rows에 있음:", any(r.get("b") == b for r in rows), "corp:", corp.get(b), "cache:", cache.get(b))
     key = urllib.parse.unquote(raw)
     got = tried = 0
     shown = 0
