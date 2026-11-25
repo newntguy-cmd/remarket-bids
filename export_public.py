@@ -229,7 +229,7 @@ def fill_missing(rows, corp, now):
         if hit and (hit.get("t") or hit.get("a")):
             corp[b] = {"a": hit.get("a", ""), "t": hit.get("t", ""), "d": hit.get("d", "")}
             continue
-        if hit and (hit.get("x") or "") >= (now - dt.timedelta(days=7)).strftime("%Y-%m-%d"):
+        if hit and (hit.get("x") or "") >= today:  # 실패 표시는 당일만 건너뜀(권한 신청 전 실패가 남지 않게)
             continue
         need.append(b)
     print(f"연락처 보충 대상 {len(need)}곳 (이번 실행 최대 {FILL_MAX}곳)")
