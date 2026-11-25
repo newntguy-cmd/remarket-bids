@@ -94,3 +94,11 @@ getCntrctInfoListCnstwk: 전체 10472건
   비즈노 화면 조회는 꺼져 있습니다(정식 API 사용 전까지)
 공개용 19840건 저장 (docs/public.json)
 입찰공고 2853건 저장 (docs/bids.json)
+연락처 보충 대상 1133곳 (이번 실행 최대 1500곳)
+  응답 예시: 3 {"response": {   "header": {     "resultCode": "00",     "resultMsg": "정상"   },   "body": {     "items": [       {         "bizno": "3778102886",         "corpNm": "주식회사 소나무",         "engCorpNm": "",         "opbizDt": "2023-12-14 00:00:00",         "rgnCd": "41281",         "rgnNm": "경기도 고양시 덕양구",         "zip": "10508",         "adrs": "경기도 고양시 덕양구 토당로104번길",         "dtlAdrs": "48-19 (토당동) 402
+  응답 예시: 3 {"response": {   "header": {     "resultCode": "00",     "resultMsg": "정상"   },   "body": {     "items": [       {         "bizno": "4068701907",         "corpNm": "(주)에스유티이엔지",         "engCorpNm": "",         "opbizDt": "2020-06-04 00:00:00",         "rgnCd": "44133",         "rgnNm": "충청남도 천안시 서북구",         "zip": "31074",         "adrs": "충청남도 천안시 서북구 4산단로",         "dtlAdrs": "28, 1층 105호,106
+  응답 예시: 3 {"response": {   "header": {     "resultCode": "00",     "resultMsg": "정상"   },   "body": {     "items": [       {         "bizno": "1258182071",         "corpNm": "주식회사 태평건설",         "engCorpNm": "TAEPYEONG",         "opbizDt": "2009-08-05 00:00:00",         "rgnCd": "41220",         "rgnNm": "경기도 평택시",         "zip": "17774",         "adrs": "경기도 평택시 관광특구로",         "dtlAdrs": "32, 2층(서정동)",   
+연락처 보충(조달청 등록정보): 1133곳 조회, 1105곳 채움
+  비즈노 화면 조회는 꺼져 있습니다(정식 API 사용 전까지)
+공개용 19840건 저장 (docs/public.json)
+입찰공고 2853건 저장 (docs/bids.json)
