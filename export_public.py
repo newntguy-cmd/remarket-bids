@@ -182,6 +182,29 @@ def bizno_lookup(biz, ua, name=""):
     return {"a": a, "t": t} if (t or a) else None
 
 
+def debug_biz(rows_corp):
+    """확인용: 특정 업체를 조달청 등록정보에서 직접 조회해 응답 항목을 로그로 남깁니다(전화·주소 원본 형태 확인)."""
+    import urllib.parse
+    import urllib.request
+    raw = os.environ.get("DATA_GO_KR_KEY", "").strip()
+    if not raw:
+        return
+    key = urllib.parse.unquote(raw)
+    for b in ("1058174543", "5018115795", "5108601247", "4098118123"):
+        for dv in ("3", "1"):
+            q = {"serviceKey": key, "pageNo": 1, "numOfRows": 5, "type": "json", "inqryDiv": dv, "bizno": b}
+            try:
+                with urllib.request.urlopen(CORP_URL + "?" + urllib.parse.urlencode(q, quote_via=urllib.parse.quote), timeout=10) as r:
+                    txt = r.read().decode("utf-8", "replace")
+                its = _items(json.loads(txt))
+                for it in its[:2]:
+                    print("  [확인]", b, dv, {k: it.get(k) for k in ("bizno", "corpNm", "telNo", "faxNo", "adrs", "dtlAdrs")})
+                if not its:
+                    print("  [확인]", b, dv, "결과 없음", txt[:200].replace("\n", " "))
+            except Exception as e:
+                print("  [확인]", b, dv, "오류", str(e)[:120])
+
+
 def fill_missing(rows, corp, now):
     """낙찰 결과에 전화·주소가 비어 있거나 가려진 법인은 조달업체 등록정보(사업자번호 조회)에서 채웁니다."""
     import urllib.parse
@@ -347,6 +370,7 @@ def main():
             })
     rows.sort(key=lambda r: (r["d"], r["amt"]), reverse=True)
     try:
+        debug_biz(corp)
         fill_missing(rows, corp, now)
     except Exception as e:
         print("연락처 보충 실패(건너뜀):", str(e)[:200])
