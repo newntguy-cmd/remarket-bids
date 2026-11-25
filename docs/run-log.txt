@@ -143,3 +143,21 @@ getCntrctInfoListCnstwk: 전체 10472건
   비즈노 화면 조회는 꺼져 있습니다(정식 API 사용 전까지)
 공개용 19840건 저장 (docs/public.json)
 입찰공고 2853건 저장 (docs/bids.json)
+  [확인] 1058174543 3 {'bizno': '1058174543', 'corpNm': '주식회사 태영건설', 'telNo': '02-2151-6999', 'faxNo': '02-2090-2243', 'adrs': '경기도 광명시 신기로', 'dtlAdrs': '20 (일직동)'}
+  [확인] 1058174543 1 결과 없음 {"nkoneps.com.response.ResponseError": {   "header": {     "resultCode": "08",     "resultMsg": "필수값 입력 에러"   } }}
+  [확인] 5018115795 3 {'bizno': '5018115795', 'corpNm': '주식회사 화성개발', 'telNo': '053-715-3049', 'faxNo': '053-715-3010', 'adrs': '대구광역시 북구 원대로', 'dtlAdrs': '130-0 (침산동, 파크드림 갤러리)'}
+  [확인] 5018115795 1 결과 없음 {"nkoneps.com.response.ResponseError": {   "header": {     "resultCode": "08",     "resultMsg": "필수값 입력 에러"   } }}
+  [확인] 5108601247 3 {'bizno': '5108601247', 'corpNm': '고려기업 주식회사', 'telNo': '02-476-6100', 'faxNo': '02-476-0155', 'adrs': '서울특별시 강동구 성내로6길', 'dtlAdrs': '42, 5층 503호 (성내동)'}
+  [확인] 5108601247 1 결과 없음 {"nkoneps.com.response.ResponseError": {   "header": {     "resultCode": "08",     "resultMsg": "필수값 입력 에러"   } }}
+  [확인] 4098118123 3 {'bizno': '4098118123', 'corpNm': '대호전기 주식회사', 'telNo': '061-353-6168', 'faxNo': '061-353-6169', 'adrs': '전남광주통합특별시 영광군 백수읍 해안로', 'dtlAdrs': '1362-70'}
+  [확인] 4098118123 1 결과 없음 {"nkoneps.com.response.ResponseError": {   "header": {     "resultCode": "08",     "resultMsg": "필수값 입력 에러"   } }}
+연락처 보충 대상 51곳 (이번 실행 최대 1500곳)
+  [상태] 1058174543 rows에 있음: True corp: None cache: None
+  [상태] 5018115795 rows에 있음: True corp: None cache: None
+  응답 예시: 3 {"response": {   "header": {     "resultCode": "00",     "resultMsg": "정상"   },   "body": {     "items": [       {         "bizno": "1058174543",         "corpNm": "주식회사 태영건설",         "engCorpNm": "TAEYOUNG E&C",         "opbizDt": "1973-11-20 00:00:00",         "rgnCd": "41210",         "rgnNm": "경기도 광명시",         "zip": "14345",         "adrs": "경기도 광명시 신기로",         "dtlAdrs": "20 (일직동)",     
+  응답 예시: 3 {"response": {   "header": {     "resultCode": "00",     "resultMsg": "정상"   },   "body": {     "items": [       {         "bizno": "5018115795",         "corpNm": "주식회사 화성개발",         "engCorpNm": "HWASUNG DEVELOPMENT CO.,LTD.",         "opbizDt": "1989-06-24 00:00:00",         "rgnCd": "27230",         "rgnNm": "대구광역시 북구",         "zip": "41590",         "adrs": "대구광역시 북구 원대로",         "dtlAdrs"
+  응답 예시: 3 {"response": {   "header": {     "resultCode": "00",     "resultMsg": "정상"   },   "body": {     "items": [       {         "bizno": "4028120569",         "corpNm": "주식회사 삼부종합건설",         "engCorpNm": "sam-bu Construction Co.,Ltd",         "opbizDt": "1994-09-30 00:00:00",         "rgnCd": "52111",         "rgnNm": "전북특별자치도 전주시 완산구",         "zip": "54954",         "adrs": "전북특별자치도 전주시 완산구 전룡로",   
+연락처 보충(조달청 등록정보): 51곳 조회, 48곳 채움
+  비즈노 화면 조회는 꺼져 있습니다(정식 API 사용 전까지)
+공개용 19840건 저장 (docs/public.json)
+입찰공고 2853건 저장 (docs/bids.json)
