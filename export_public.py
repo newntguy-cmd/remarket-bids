@@ -113,7 +113,7 @@ def export_bids(bids, now):
 
 
 CORP_URL = "https://apis.data.go.kr/1230000/ao/UsrInfoService02/getPrcrmntCorpBasicInfo02"
-FILL_MAX = 600
+FILL_MAX = 600  # 조달청 사용자정보서비스 활용신청 완료(2026-11-25)
 
 
 def _clean(v):
