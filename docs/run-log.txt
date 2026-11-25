@@ -85,3 +85,12 @@ getCntrctInfoListCnstwk: 전체 10472건
   비즈노 화면 조회는 꺼져 있습니다(정식 API 사용 전까지)
 공개용 19840건 저장 (docs/public.json)
 입찰공고 2853건 저장 (docs/bids.json)
+연락처 보충 대상 1388곳 (이번 실행 최대 600곳)
+  응답 예시: 3 {"response": {   "header": {     "resultCode": "00",     "resultMsg": "정상"   },   "body": {     "items": [       {         "bizno": "4078121113",         "corpNm": "(유) 광덕종합건설",         "engCorpNm": "gwangdeok",         "opbizDt": "2010-05-03 00:00:00",         "rgnCd": "52190",         "rgnNm": "전북특별자치도 남원시",         "zip": "55763",         "adrs": "전북특별자치도 남원시 남문로",         "dtlAdrs": "437-0 (하정
+  응답 예시: 3 {"response": {   "header": {     "resultCode": "00",     "resultMsg": "정상"   },   "body": {     "items": [       {         "bizno": "6098146006",         "corpNm": "세연종합건설 주식회사",         "engCorpNm": "SE YEON",         "opbizDt": "2001-02-05 00:00:00",         "rgnCd": "48121",         "rgnNm": "경상남도 창원시 의창구",         "zip": "51375",         "adrs": "경상남도 창원시 의창구 사화로9번길",         "dtlAdrs": "19, 3
+  응답 예시: 3 {"response": {   "header": {     "resultCode": "00",     "resultMsg": "정상"   },   "body": {     "items": [       {         "bizno": "3018620878",         "corpNm": "나로건설 주식회사",         "engCorpNm": "naro7777",         "opbizDt": "2012-12-26 00:00:00",         "rgnCd": "43770",         "rgnNm": "충청북도 음성군",         "zip": "27628",         "adrs": "충청북도 음성군 금왕읍 무극로333번길",         "dtlAdrs": "18",    
+  조달청 조회 중단(시간 240초, 연속 실패 0회)
+연락처 보충(조달청 등록정보): 255곳 조회, 248곳 채움
+  비즈노 화면 조회는 꺼져 있습니다(정식 API 사용 전까지)
+공개용 19840건 저장 (docs/public.json)
+입찰공고 2853건 저장 (docs/bids.json)
