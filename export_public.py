@@ -113,7 +113,7 @@ def export_bids(bids, now):
 
 
 CORP_URL = "https://apis.data.go.kr/1230000/ao/UsrInfoService02/getPrcrmntCorpBasicInfo02"
-FILL_MAX = 600  # 조달청 사용자정보서비스 활용신청 완료(2026-11-25)
+FILL_MAX = 1500
 
 
 def _clean(v):
@@ -217,7 +217,7 @@ def fill_missing(rows, corp, now):
     t0 = _t.time()
     fails = 0
     for b in need[:FILL_MAX]:
-        if _t.time() - t0 > 240 or fails >= 8:
+        if _t.time() - t0 > 900 or fails >= 8:
             print(f"  조달청 조회 중단(시간 {int(_t.time() - t0)}초, 연속 실패 {fails}회)")
             break
         tried += 1
