@@ -214,6 +214,8 @@ def fill_missing(rows, corp, now):
         print("DATA_GO_KR_KEY 없음: 연락처 보충 건너뜀")
         return
     cache = rmcrypt.load("corpx") or {}
+    # 응답이 정상으로 확인되지 않은 실패 표시는 버립니다(시간초과·권한 전 실패가 남아 업체가 빠지던 문제)
+    cache = {k: v for k, v in cache.items() if not (v.get("x") and not v.get("ok"))}
     today = now.strftime("%Y-%m-%d")
     need = []
     for r in rows:
@@ -247,16 +249,18 @@ def fill_missing(rows, corp, now):
             break
         tried += 1
         found = None
+        okresp = False
         for extra in ({"inqryDiv": "3", "bizno": b}, {"inqryDiv": "1", "bizno": b}):
             q = {"serviceKey": key, "pageNo": 1, "numOfRows": 5, "type": "json"}
             q.update(extra)
             try:
-                with urllib.request.urlopen(urllib.request.Request(CORP_URL + "?" + urllib.parse.urlencode(q, quote_via=urllib.parse.quote), headers={"User-Agent": "remarket-bids/1.0"}), timeout=8) as resp:
+                with urllib.request.urlopen(urllib.request.Request(CORP_URL + "?" + urllib.parse.urlencode(q, quote_via=urllib.parse.quote), headers={"User-Agent": "remarket-bids/1.0"}), timeout=25) as resp:
                     txt = resp.read().decode("utf-8", "replace")
                 if shown < 3:
                     print("  응답 예시:", extra.get("inqryDiv"), txt[:400].replace("\n", " "))
                     shown += 1
                 its = _items(json.loads(txt))
+                okresp = okresp or ('"resultCode": "00"' in txt or '"resultCode":"00"' in txt)
             except Exception as e:
                 fails += 1
                 if shown < 3:
@@ -279,8 +283,8 @@ def fill_missing(rows, corp, now):
             cache[b] = found
             corp[b] = dict(found)
             got += 1
-        else:
-            cache[b] = {"x": today}
+        elif okresp:
+            cache[b] = {"x": today, "ok": 1}
     print(f"연락처 보충(조달청 등록정보): {tried}곳 조회, {got}곳 채움")
     # 2차: 조달청에도 없으면 비즈노에서 사업자번호로 찾습니다 (robots.txt 가 막으면 하지 않고, 천천히 소량만)
     import urllib.request
