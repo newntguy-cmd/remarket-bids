@@ -1,20 +1,5 @@
-  21쪽 시도 1/5 실패: <urlopen error _ssl.c:994: The handshake operation timed out>
-조회 기간 202611210000 ~ 202611261249
-  구간 11-21 ~ 11-26
-전체 2613건, 1쪽 100건
-받은 공고 2613건
-저장 완료: 누적 27529건
-조회 기간 낙찰 202611210000 ~ 202611261252 / 계약 202611210000 ~ 202611261252
-getScsbidListSttusCnstwk: 전체 1673건
-getOpengResultListInfoCnstwk: 전체 1303건
-getOpengResultListInfoCnstwk: 전체 811건
-getOpengResultListInfoCnstwk: 전체 317건
-getOpengResultListInfoCnstwk: 전체 1094건
-getOpengResultListInfoCnstwk: 전체 1204건
-getOpengResultListInfoCnstwk: 전체 157건
-getOpengResultListInfoCnstwk: 전체 676건
-getOpengResultListInfoCnstwk: 전체 222건
-getCntrctInfoListCnstwk: 전체 25618건
-  5쪽 시도 1/5 실패: <urlopen error _ssl.c:994: The handshake operation timed out>
-getCntrctInfoListCnstwk: 전체 506건
-저장 완료: 낙찰 18585건, 계약 17424건, 개찰 1순위(낙찰 예정) 2256건
+조회 기간 202611220000 ~ 202611271250
+  구간 11-22 ~ 11-27
+전체 3362건, 1쪽 100건
+받은 공고 3362건
+저장 완료: 누적 28275건
